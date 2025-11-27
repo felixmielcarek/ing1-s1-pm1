@@ -226,6 +226,7 @@ app.layout = html.Div(
             className='sidebar'
         ),
         dcc.Store(id='active-tab'),
+        
         html.Table(
             children=[
                 # Première ligne
