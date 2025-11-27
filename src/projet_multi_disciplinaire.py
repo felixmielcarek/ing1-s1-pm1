@@ -226,7 +226,7 @@ app.layout = html.Div(
             className='sidebar'
         ),
         dcc.Store(id='active-tab'),
-        
+        dcc.Dropdown(id='dataframe-drp',options={'label':'DataFrame Brut','value':'df_brut'},value='df_brut',style={'display':'inline-block','width':'120%','vertical-align': 'top-right','margin':'auto','backgroundColor': '#e7e7f4', 'color': 'black','border':'none','borderRadius': '10px'}),
         html.Table(
             children=[
                 # Première ligne
