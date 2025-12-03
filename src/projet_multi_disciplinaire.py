@@ -7,6 +7,7 @@ from dash import Dash, html, Input, Output, ctx
 from dash import html,dcc,dash_table
 import requests
 from io import StringIO
+from front_end import app_layout
 css_code="""
 <style>
 .sidebar {
@@ -175,150 +176,8 @@ app.index_string=f"""
             </body>
         </html>
 """
-app.layout = html.Div(
-    style={
-        'backgroundColor': '#fdf2e9',
-        'position': 'relative',
-        'top': 0,
-        'bottom': 0,
-        'left': 0,
-        'right': 0,
-        'min-height': '10000px',
-        'min-width': 'auto',
-        'color': 'black',
-        'font-family': 'Arial'
-    },
-    children=[
-        html.Div(
-            id='sidebar',
-            children=[
-                html.Div(
-                    id='sidebar-content',
-                    children=[
-                        html.Div([
-                            html.I(className='bi bi-table'),
-                            html.Span('Tableau', className='sidebar-text')
-                        ], id='tab-tableau', className='sidebar-link', n_clicks=0),
-                        html.Div([
-                            html.I(className='bi bi-graph-up'),
-                            html.Span('Graphique', className='sidebar-text')
-                        ], id='tab-graphique', className='sidebar-link', n_clicks=0),
-                        html.Div([
-                            html.I(className='bi bi-map'),
-                            html.Span('Maps', className='sidebar-text')
-                        ], id='tab-maps', className='sidebar-link', n_clicks=0),
-                        html.Div([
-                            html.I(className='bi bi-gear'),
-                            html.Span('Fonctions', className='sidebar-text')
-                        ], id='tab-fonctions', className='sidebar-link', n_clicks=0),
-                        html.Div([
-                            html.I(className='bi bi-download'),
-                            html.Span('Exporter le fichier', className='sidebar-text')
-                        ], id='tab-exporter', className='sidebar-link', n_clicks=0),
-                        html.Div([
-                            html.I(className='bi bi-info-circle'),
-                            html.Span('Informations', className='sidebar-text')
-                        ], id='tab-informations', className='sidebar-link', n_clicks=0),
-                    ],
-                    className='sidebar-content'
-                ),
-            ],
-            className='sidebar'
-        ),
-        dcc.Store(id='active-tab'),
-        dcc.Dropdown(id='dataframe-drp',options={'label':'DataFrame Brut','value':'df_brut'},value='df_brut',style={'display':'inline-block','width':'120%','vertical-align': 'top-right','margin':'auto','backgroundColor': '#e7e7f4', 'color': 'black','border':'none','borderRadius': '10px'}),
-        html.Table(
-            children=[
-                # Première ligne
-                html.Tr([
-                    html.Td([]),  # Partie supérieure gauche vide
-                    html.Td([
-                        html.Div(id='affichage_element'),
-                        html.Table(
-                            id='table-graph_2',
-                            children=[
-                                html.Div([
-                                    html.Div([
-                                        html.Div(id='text_x_axis', children=["Choissisez votre axe x"], style={'display': 'inline-block'}),
-                                        html.Div(id='unité_x', children=["Choissisez votre unité x"], style={'display': 'inline-block', 'margin-left': '15px'}),
-                                        dcc.Input(id='x-axis-unit', type='text', style={'display': 'none'}),
-                                        dcc.Dropdown(id='x-axis', placeholder="Axe X", style={'vertical-align': 'left', 'display': 'none', 'width': '50%'})
-                                    ], style={'display': 'inline-block', 'vertical-align': 'top-left', 'width': '30%'}),
-                                    html.Div([
-                                        html.Div(id='text_y_axis', children=["Choissisez votre axe y"], style={'display': 'inline-block'}),
-                                        html.Div(id='unité_y', children=["Choissisez votre unité y"], style={'display': 'inline-block', 'margin-left': '20px'}),
-                                        dcc.Input(id='y-axis-unit', type='text', style={'display': 'none'}),
-                                        dcc.Dropdown(id='y-axis', placeholder="Axes Y primaire", multi=True, style={'vertical-align': 'center', 'display': 'none', 'width': '60%'})
-                                    ], style={'display': 'inline-block', 'vertical-align': 'top-center', 'width': '30%', 'margin-left': '50px'}),
-                                    html.Div([
-                                        html.Br(),
-                                        html.Div(id='text_y2_axis', children=["Choissisez votre axe y2"], style={'display': 'inline-block'}),
-                                        html.Div(id='unité_y2', children=["Choissisez votre unité y2"], style={'display': 'inline-block', 'margin-left': '20px'}),
-                                        dcc.Input(id='y2-axis-unit', type='text', style={'display': 'none'}),
-                                        dcc.Dropdown(id='y2-axis', placeholder="Axes Y secondaire", multi=True, style={'overflowY': 'auto', 'vertical-align': 'right', 'display': 'none', 'width': '60%'})
-                                    ], style={'display': 'inline-block', 'vertical-align': 'right', 'width': '30%', 'margin-left': '50px'}),
-                                ], style={'display': 'inline-block', 'margin-left': '120px', 'vertical-align': 'top'})
-                            ],
-                            style={"display": 'none', 'margin': 'auto', 'width': '100%'}
-                        )
-                    ])
-                ]),
-                # Deuxième ligne
-                html.Tr([
-                    html.Td([
-                        dcc.RadioItems(
-                            id='type_graph',
-                            options=[
-                                {'label': 'Linéaire', 'value': 'line'},
-                                {'label': 'Nuage de point', 'value': 'dot'},
-                                {'label': 'Histogramme', 'value': 'bar'}
-                            ],
-                            value='line',
-                            inline=True,
-                            style={'display': 'none'}
-                        ),
-                        html.Div(
-                            id='affichage_slider_point',
-                            children=[
-                                html.Label('Taille des points'),
-                                dcc.Slider(
-                                    id='point-size-slider',
-                                    min=5,
-                                    max=20,
-                                    step=2,
-                                    value=7,
-                                ),
-                                html.Label('Clarté des points'),
-                                dcc.Slider(
-                                    id='point-opacity-slider',
-                                    min=0.1,
-                                    max=1,
-                                    step=0.2,
-                                    value=0.5,
-                                ),
-                                html.Label('Taille de la police'),
-                                dcc.Slider(
-                                    id='font-size-slider',
-                                    min=10,
-                                    max=30,
-                                    step=5,
-                                    value=15,
-                                ),
-                            ],
-                            style={'display': 'none', 'margin': 'auto', 'width': '100%'}
-                        )
-                    ])
-                ])
-            ],
-            style={
-                "width": "100%",
-                "borderCollapse": "collapse",
-                "margin-left": "60px",
-                "display": "flex",
-            }
-        )
-    ]
-)
+app.layout = app_layout
+
 
 @app.callback(
     Output('active-tab','data'),
