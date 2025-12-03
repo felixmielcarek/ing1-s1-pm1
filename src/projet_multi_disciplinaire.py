@@ -65,10 +65,9 @@ css_code="""
 }
 </style>
 """
-url ="https://data.statistiques.developpement-durable.gouv.fr/dido/api/v1/datafiles/1582861b-e042-4490-9161-6429d8229703/csv?COMMUNE_CODE=startsWith%3A77"
-response = requests.get(url)
-csv_data = StringIO(response.text)
-df = pd.read_csv(csv_data,delimiter=';',encoding='utf-8')
+url =r"C:\Users\micae\Desktop\Projet multisciplinaire\Projet multisciplinaire CODE\ing1-s1-pm1\Data\Donnees-sur-le-parc-de-vehicules-au-niveau-communal.2025-09.csv" #"https://data.statistiques.developpement-durable.gouv.fr/dido/api/v1/datafiles/1582861b-e042-4490-9161-6429d8229703/csv?COMMUNE_CODE=startsWith%3A77"
+
+df = pd.read_csv(url,delimiter=';',encoding='utf-8')
 
 #Fonction permmettant d'afficher le Tableau et le summary   
 def Tableau(df):

@@ -3,7 +3,7 @@
 import dash
 from dash import html,dcc,dash_table
 import plotly.graph_objects as go
-import modin.pandas as pd
+import pandas as pd
 from plotly.subplots import make_subplots
 from dash import html, dcc, Output, Input,State, ctx
 import dash_bootstrap_components as dbc
@@ -24,7 +24,6 @@ import inspect
 import shutil
 import sys
 from front_end import app_layout
-import traitement_fichier
 import modin.config as cfg
 from dask.distributed import Client
 import multiprocessing
@@ -33,12 +32,6 @@ import time
 from docx import Document
 import glob
 import pandas as pd
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain_community.vectorstores import Qdrant  
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import VectorParams, Distance
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
 
 
 def Tableau(df,couleur_text,couleur_background):
