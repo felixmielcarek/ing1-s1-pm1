@@ -17,3 +17,9 @@ The subject of this project is available at the following link: [click me](https
 ```
 
 # Copyright
+
+
+
+# Notes
+
+- 
