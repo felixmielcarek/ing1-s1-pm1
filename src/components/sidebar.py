@@ -3,7 +3,7 @@ import dash.html as html
 def generate_sidebar_item(icon_classname, title, div_id):
     return html.Div(
         [
-            html.I(className='bi ' + icon_classname),
+            html.Div(className='bi ' + icon_classname),
             html.Span(title, className='sidebar-text')
         ], 
         id = div_id, 
