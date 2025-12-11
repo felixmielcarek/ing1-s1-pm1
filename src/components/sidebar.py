@@ -1,5 +1,4 @@
-import dash
-from dash import html
+import dash.html as html
 
 def generate_sidebar_item(icon_classname, title, div_id):
     return html.Div(
