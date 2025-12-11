@@ -1,7 +1,7 @@
 #Message pour le bouton Aide 
 modal = dbc.Modal(
     [
-        dbc.ModalHeader("Aide",style={'backgroundColor':couleur_background, 'color':couleur_text}),
+        dbc.ModalHeader("Aide",style={'backgroundColor':'#fdf2e9', 'color':'black'}),
         dbc.ModalBody(
             [dcc.Markdown('''
                 ## Utilité
@@ -98,17 +98,17 @@ modal = dbc.Modal(
 
                                
                           
-            ],style={'backgroundColor':couleur_background, 'color': couleur_text}
+            ],style={'backgroundColor':'#fdf2e9', 'color': 'black'}
         ),
         dbc.ModalFooter(
-            dbc.Button("Fermer", id="close", className="ml-auto"),style={'backgroundColor':couleur_background, 'color': couleur_text}
+            dbc.Button("Fermer", id="close", className="ml-auto"),style={'backgroundColor':'#fdf2e9', 'color': 'black'}
         ),
     ],
     id="modal",
     size="fullscreen",#“sm”, “lg”, “xl” et “fullscreen”.
     style={
-        'backgroundColor':couleur_background, # Couleur de fond du bouton
-        'color': couleur_text, # Couleur du texte du bouton
+        'backgroundColor':'#fdf2e9', # Couleur de fond du bouton
+        'color': 'black', # Couleur du texte du bouton
         'border': '2px solid #4b5160' # Supprime la bordure par défaut du bouton
     }
 )

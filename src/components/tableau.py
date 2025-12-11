@@ -28,19 +28,19 @@ def Tableau(df,couleur_text,couleur_background):
         style_data_conditional=[
             {
                 'if': {'row_index': 'odd'},
-                'backgroundColor': couleur_background,
-                'color': couleur_text,
+                'backgroundColor': '#fdf2e9',
+                'color': 'black',
 
             },
             {
                 'if': {'row_index': 'even'},
-                'backgroundColor': couleur_background,
-                'color': couleur_text,
+                'backgroundColor': '#fdf2e9',
+                'color': 'black',
             },
         ],
         style_header={
-            'backgroundColor': couleur_background,
-            'color': couleur_text
+            'backgroundColor': '#fdf2e9',
+            'color': 'black'
         },
         style_table={'overflowX': 'auto'},
         style_cell={'width': 'auto'},
@@ -53,21 +53,21 @@ def Tableau(df,couleur_text,couleur_background):
     style_data_conditional=[
         {
             'if': {'row_index': 'odd'},
-            'backgroundColor': couleur_background,
-            'color': couleur_text,
+            'backgroundColor': '#fdf2e9',
+            'color': 'black',
             'width':'100%',
         },
         {
             'if': {'row_index': 'even'},
-            'backgroundColor': couleur_background,
-            'color': couleur_text,
+            'backgroundColor': '#fdf2e9',
+            'color': 'black',
             'width':'100%',
         },
 
     ],
     style_header={
-        'backgroundColor': couleur_background,
-        'color': couleur_text
+        'backgroundColor': '#fdf2e9',
+    'color': 'black'
     },   
     style_table={'overflowX': 'auto', 'overflowY': 'auto', 'maxHeight': '300px', 'width': '100%'}, 
     fixed_rows={'headers': True, 'data': 0},

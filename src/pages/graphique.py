@@ -1,214 +1,34 @@
-@app.callback(
-    Output('x-axis','style'),
-    Output('y-axis','style'),
-    Output('y2-axis','style'),
-    Output('text_x_axis','style'),
-    Output('text_y_axis','style'),
-    Output('text_y2_axis','style'),
-    Output('unité_x','style'),
-    Output('unité_y','style'),
-    Output('unité_y2','style'),
-    Output('x-axis-unit','style'),
-    Output('y-axis-unit','style'),
-    Output('y2-axis-unit','style'),
-    Output('type_graph','style'),
-    Output('x-axis','options'),
-    Output('y-axis','options'),
-    Output('y2-axis','options'),
-    Input('active-tab','data')
-)
-def update_elements_graphique(tab):
-    global df
-    if tab=='graphique':
-        options=[{'label': col, 'value': col} for col in df.columns]
-        style={'vertical-align': 'left', 'display': 'inline-block', 'width': '50%'}
-        return style,{'vertical-align': 'center', 'display': 'inline-block', 'width': '60%'}, {'vertical-align': 'right', 'display': 'inline-block', 'width': '60%'}, {'display': 'inline-block'}, {'display': 'inline-block'}, {'display': 'inline-block'}, {'display': 'inline-block', 'margin-left': '15px'}, {'display': 'inline-block', 'margin-left': '20px'}, {'display': 'inline-block', 'margin-left': '20px'}, {'display': 'inline-block'}, {'display': 'inline-block'}, {'display': 'inline-block'}, {'display':'block'}, options, options, options
-    else:
-        return {'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},dash.no_update,dash.no_update,dash.no_update 
 
-# Fonctions d'ajustement
-def linear(x, a, b):
-    return a * x + b
+from dash import Input, Output, callback, ctx
+import dash_bootstrap_components as dbc
+import pathlib
+from dash import dcc, html
 
-def cauchy(x, A, B, C):
-    return A + B / x**2 + C / x**4
+import dash
+from dash import html,dcc,dash_table
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from dash import html, dcc, Output, Input,State, ctx
+import numpy as np
+from dash import no_update
+from scipy.optimize import curve_fit
+from scipy.special import factorial
+import os
+import importlib.util
+import subprocess
+import re
+import inspect
 
-def cubic(x, a, b, c, d):
-    return a * x**3 + b * x**2 + c * x + d
+import shutil
+import sys
 
-def damped(x, a, b, d):
-    return a * np.exp(-b * x) + d
+import glob
+import pandas as pd
 
-def damped_oscillator(x, A0, b, omega, delta, C):
-    return A0 * np.exp(-b * x) * np.sin(omega * x + delta) + C
+import  utils.Fonctions
 
-def exponential(x, a, b, c):
-    return a * np.exp(b * x) + c
-
-def gaussian(x, A0, x0, sigma, C):
-    return A0 * np.exp(- (x - x0)**2 / (2 * sigma**2)) + C
-
-def inverse(x, a, b):
-    return a + b / x
-
-def logistic(x, A, B, C):
-    return A / (1 + np.exp(-B * (x - C)))
-
-def lorentzian(x, A, omega0, beta, C):
-    return (A * np.sqrt((omega0**2 - x**2)**2 + 4 * x**2 * beta**2)) + C
-
-def natural_log(x, a, b):
-    return a * np.log(x * b)
-
-def oscillator(x, A0, k, delta, C):
-    return A0 * np.sin(k * x + delta) + C
-
-def poisson(x, a, mu):
-    return a * np.exp(-mu) * (mu**x / factorial(x))
-
-def power_law(x, a, b):
-    return a * x**b
-
-def power_law_offset(x, A, B, x0, C):
-    return A * (x - x0)**B + C
-
-def quadratic(x, a, b, c):
-    return a * x**2 + b * x + c
-
-def Quartic (x,a,b,c,d,e):
-    return a*x**4+b*x**3+c*x**2+d*x+e
-
-def stokes_law(x, k0, a0, K1):
-    return (k0 / (18 * a0)) * x**2 * (1 - 2.1 * x / K1)
-
-def two_slit_interference(x, A, k1, k2, x0, C):
-    return A * np.sinc(k1 * (x - x0) / np.pi)**2 * np.cos(k2 * (x - x0))**2 + C
-
-def smooth_y_values(df, x_column, y_column, window_size=9):
-    sorted_df = df.sort_values(by=x_column)
-    smoothed_y = sorted_df[y_column].rolling(window=window_size, center=True).mean()
-    return sorted_df[x_column], smoothed_y
-
-# Exemple de fonction de calcul du R²
-def calculate_r_squared(x, y, func, popt):
-    residuals = y - func(x, *popt)
-    ss_res = sum(residuals**2)
-    ss_tot = sum((y - y.mean())**2)
-    return 1 - (ss_res / ss_tot)
-
-# Dictionnaire des fonctions
-fitting_functions = {
-    'Linear': linear,
-    'Cauchy': cauchy,
-    'Cubic': cubic,
-    'Damped Function': damped,
-    'Damped Oscillator': damped_oscillator,
-    'Exponential': exponential,
-    'Gaussian': gaussian,
-    'Inverse': inverse,
-    'Logistic': logistic,
-    'Lorentzian': lorentzian,
-    'Natural Log': natural_log,
-    'Oscillator': oscillator,
-    'Poisson': poisson,
-    'Power Law': power_law,
-    'Power Law with Offsets': power_law_offset,
-    'Quadratic': quadratic,
-    'Quartic':Quartic,
-    'Stokes Law': stokes_law,
-    'Two Slit Interference': two_slit_interference,
-    'Courbe moyennée 24h': smooth_y_values,
-}
-
-def create_scatter_trace(x, y, name, mode='markers', secondary_y=False, **kwargs):
-    """
-    Crée une trace Scatter pour un graphique Plotly.
-    """
-    return go.Scatter(x=x, y=y, name=name, mode=mode, **kwargs), secondary_y
-
-def add_regression_trace(fig, x_data, y_data, fitting_function, y_axis_name):
-    """
-    Ajoute une courbe de régression au graphique.
-    """
-    mask = ~np.isnan(x_data) & ~np.isnan(y_data)
-    x_data = x_data[mask]
-    y_data = y_data[mask]
-    
-    popt, _ = curve_fit(fitting_function, x_data, y_data)
-    y_fit = fitting_function(x_data, *popt)
-    
-    equation = f"Regression {y_axis_name}: y = {popt[0]:.2f}x + {popt[1]:.2f}"
-    fig.add_trace(go.Scatter(x=x_data, y=y_fit, name=equation, mode='lines', line=dict(color='black', width=3)))
-    
-    return equation
-
-#Fonctions permettant de savoir quel equation afficher
-def choix_equation(fitting_function, *popt):
-    match fitting_function:
-        case 'Linear':
-            return "y = {:.2e}x + {:.2e}".format(*popt)
-        case 'Cauchy':
-            return "y = {:.2e}+{:.2e}/x^2 + {:.2e}/x^4".format(*popt)
-        case 'Cubic':
-            return "y = {:.2e} * x^3 + {:.2e} * x^2 + {:.2e} * x + {:.2e}".format(*popt)
-        
-        case 'Damped Function':
-            return "y = {:.2e}e^(-{:.2e}x) + {:.2e}".format(*popt)
-        
-        case 'Damped Oscillator':
-            return "y = {:.2e}e^(-{:.2e}x) * sin({:.2e} * x+{:.2e}) + {:.2e}".format(*popt)
-        
-        case 'Exponential':
-            return "y = {:.2e}e^({:.2e}x)+{:.2e}".format(*popt)
-        
-        case 'Gaussian':
-            return "y = {:.2e}e^(-(x - {:.2e})^2 / (2 * {:.2e}^2))+{:.2e}".format(*popt)
-        
-        case 'Inverse':
-            return "y = {:.2e} / ({:.2e} + x )".format(*popt)
-        
-        case 'Logistic':
-            return "y = {:.2e} / (1 + {:.2e}e^(-{:.2e}x))".format(*popt)
-        
-        case 'Lorentzian':
-            A, omega0, beta, C = popt
-            return "y = {:.2e} * sqrt((({:.2e}^2 - x^2)^2 + 4 * x^2 * {:.2e}^2)) + {:.2e}".format(A, omega0, beta, C)
-
-        
-        case 'Natural Log':
-            return "y = {:.2e} * ln( x * {:.2e} )".format(*popt)
-        
-        case 'Oscillator':
-            return "y = {:.2e} * sin(2π * {:.2e} * x + {:.2e})+{:.2e}".format(*popt)
-        
-        case 'Poisson':
-            return "y = {:.2e} * e^(-{:.2e}) * ({:.2e})^x / x!".format(popt[0], popt[1], popt[1])
-        
-        case 'Power Law':
-            return "y = {:.2e} * x^{:.2e}".format(*popt)
-        
-        case 'Power Law with Offsets':
-            return "y = {:.2e} * (x - {:.2e})^{:.2e} + {:.2e}".format(*popt)
-        
-        case 'Quadratic':
-            return "y = {:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
-        case'Quartic':
-            return "y = {:.2e}x^4+{:.2e}x^3 +{:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
-
-        case 'Stokes Law':
-            k0, a0, K1 = popt
-            return "y = ({:.2e} / (18 * {:.2e})) * x^2 * (1 - 2.1 * x / {:.2e})".format(k0, a0, K1)
-
-        
-        case 'Two Slit Interference':
-            val_x0 = popt[3]
-            formatted_val_x0 = "{:.2e}".format(val_x0)
-            return "y = {:.2e} * sinc^2({:.2e} * (x - {}) / π) * cos^2({:.2e} * (x - {:.2e})) + {:.2e}".format(popt[0], popt[1], formatted_val_x0, popt[2], val_x0, popt[4])
-
-
-
-
-graphique_layout = html.Table(id='table-graph',children=[
+def affichage_graphique():
+    return html.Table(id='table-graph',children=[
                 html.Tr([ 
                     html.Td([
         html.Div([
@@ -229,7 +49,7 @@ graphique_layout = html.Table(id='table-graph',children=[
                   html.Br(),
                   html.Div([dcc.Dropdown( #Dropdown qui affichera toutes les types de données utilisable
                       id='choix_df_drp',
-                      options=[{'label': 'Données Brut', 'value': 'DF_Brut'}],value='DF_Brut',style={'display':'none','width':'120%','vertical-align': 'top-right','margin':'auto','backgroundColor': couleur_drpbackground, 'color': couleur_text,'border':'none','borderRadius': '10px'}
+                      options=[{'label': 'Données Brut', 'value': 'DF_Brut'}],value='DF_Brut',style={'display':'none','width':'120%','vertical-align': 'top-right','margin':'auto','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px'}
                   ),],style={'display':'flex'}),
                   
                   html.Div(id='options_graph_largeur'),
@@ -244,7 +64,7 @@ graphique_layout = html.Table(id='table-graph',children=[
                   dcc.Dropdown(
                         id='type_curve_fitting',
                         options=[{'label': i, 'value': i} for i in fitting_functions.keys()],
-                        style={'display':'none','width':'80%','backgroundColor': couleur_drpbackground, 'color': couleur_text,'border':'none','borderRadius': '10px'},
+                        style={'display':'none','width':'80%','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px'},
                   ),
                   dcc.RadioItems(
                       id='Regression',#Ce RadioItems permets d'appliquer une Regression ou non a notre graphique sa valeur par defaut est Sans Regression
@@ -375,9 +195,4 @@ graphique_layout = html.Table(id='table-graph',children=[
 ])
      
     ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}), #1e2130
-
-
-
-
-
 

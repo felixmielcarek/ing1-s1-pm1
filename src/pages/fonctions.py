@@ -193,10 +193,10 @@ fonctions_layout = html.Div([
                 
                 html.Div(id='info_filtre_3'),
 
-                dcc.Dropdown(id='filtrage_temp_heure_debut', placeholder='Entrez le debut du filtrage horaire', style={'overflowY':'visible','vertical-align':'right','display': 'none','backgroundColor': couleur_drpbackground, 'color': couleur_text,'border':'none','borderRadius': '10px','width':'90%'}),
+                dcc.Dropdown(id='filtrage_temp_heure_debut', placeholder='Entrez le debut du filtrage horaire', style={'overflowY':'visible','vertical-align':'right','display': 'none','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','width':'90%'}),
                 html.Div(id='saut_filtre_1'),
 
-                dcc.Dropdown(id='filtrage_temp_heure_fin', placeholder='Entrez la fin du filtrage horaire', style={'overflowY':'visible','vertical-align':'right','display': 'none','backgroundColor': couleur_drpbackground, 'color': couleur_text,'border':'none','borderRadius': '10px','width':'90%'}),
+                dcc.Dropdown(id='filtrage_temp_heure_fin', placeholder='Entrez la fin du filtrage horaire', style={'overflowY':'visible','vertical-align':'right','display': 'none','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','width':'90%'}),
                 html.Div(id='msg_filtrage_donnees',style={'vertical-align':'top','display':'flex'}),
                 
 
