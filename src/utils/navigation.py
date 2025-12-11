@@ -1,37 +1,5 @@
-@app.callback(
-    Output('active-tab','data'),
-    Input('tab-tableau','n_clicks'),
-    Input('tab-graphique','n_clicks'),
-    Input('tab-maps','n_clicks'),
-    Input('tab-fonctions','n_clicks'),
-    Input('tab-informations','n_clicks'),
-)
-def flag_onglets(n1,n2,n3,n4,n5):
-    if ctx.triggered_id is not None:
-        return ctx.triggered_id.replace('tab-','')
-    return 'tableau'
 
-@app.callback(
-    Output('affichage_element','children'),
-    Output('affichage_slider_point','style'),
-    Output('table-graph_2','style'),
-    Input('active-tab','data')
-)
-def affichage_onglet(tab):
-    global df
-    if tab=='tableau':
-        return Tableau(df),{'display':'none'},{'display':'none'}
-    elif tab=='graphique':
-        return None,{"display":'block','margin':'auto','width':'100%'},{'display':'block'}
-    elif tab=='maps':
-        return dash.no_update,{'display':'none'},{'display':'none'}
-    elif tab=='informations':
-        return dash.no_update,{'display':'none'},{'display':'none'}
-    elif tab=='fonctions':
-        return dash.no_update,{'display':'none'},{'display':'none'}
-
-dcc.Store(id='active-tab', data='tableau'),
-
+"""
 dcc.Loading(
     id="loading",
     type="dot",
@@ -65,3 +33,38 @@ dcc.Loading(
         dcc.Store(id='filtrage_df_ok'),
     ]
 )
+
+"""
+
+from dash import Input, Output, callback, ctx
+from pages.tableau import *
+from pages.informations import *
+
+@callback(
+    Output('page-content', 'children'),
+
+    Input('tab-tableau','n_clicks'),
+    Input('tab-graphique','n_clicks'),
+    Input('tab-maps','n_clicks'),
+    Input('tab-fonctions','n_clicks'),
+    Input('tab-informations','n_clicks')
+)
+def generate_page_content(tableau_click,
+                          graphique_click,
+                          maps_click,
+                          fonctions_click,
+                          informations_click):
+    match ctx.triggered_id:
+        case 'tab-tableau':
+            return generate_tableau_page()
+        case 'tab-graphique':
+            return generate_tableau_page()
+        case 'tab-maps':
+            return generate_tableau_page()
+        case 'tab-fonctions':
+            return generate_tableau_page()
+        case 'tab-informations':
+            return generate_informations_page()
+        
+        case _:
+            return generate_tableau_page()

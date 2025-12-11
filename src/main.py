@@ -7,6 +7,7 @@ import pathlib
 
 #region FUNC IMPORTS
 from components.sidebar import *
+from utils.navigation import *
 #endregion
 
 
@@ -32,7 +33,11 @@ df = pd.read_csv(RAW_DATA_PATH.joinpath("rawdata.csv"),delimiter=';',encoding='u
 #endregion
 
 #region APP LAYOUT
-app.layout = generate_sidebar()
+app.layout = html.Div(
+    [
+        generate_sidebar(),
+        html.Div(id='page-content')
+    ])
 #enregion
 
 #region RUN
