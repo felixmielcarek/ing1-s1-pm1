@@ -37,7 +37,7 @@ app.layout = html.Div(
     [
         generate_sidebar(),
         html.Div(id='page-content')
-    ])
+    ], id='main-content')
 #enregion
 
 #region RUN

@@ -10,3 +10,8 @@ button {
 .dropdown {
     background-color:'#eeeeee';
 }
+
+#main-content {
+    display: flex;
+    flex-direction: row;
+}
