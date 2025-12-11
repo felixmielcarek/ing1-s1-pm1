@@ -19,8 +19,6 @@ from dash.exceptions import PreventUpdate
 from scipy.special import factorial
 import os
 
-
-
 app_layout=html.Div(style={
     'backgroundColor': couleur_background, #'#fae5d3', 
     'position': 'relative', 
@@ -36,14 +34,8 @@ app_layout=html.Div(style={
 children=[# Definition du layout affichage principale
 #Création des differents onglets
     # Sidebar avec onglets       
-        
-           
-   html.Div([ 
-            
-        
-                    
 
-
+   html.Div([    
                
     ], style={'width': '50%', 'display': 'inline-block', 'vertical-align': 'top'}),
     html.Div([

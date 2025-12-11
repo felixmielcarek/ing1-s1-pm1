@@ -1,0 +1,3 @@
+```bash
+pip install dash dash-bootstrap-components pandas pathlib
+```
