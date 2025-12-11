@@ -1,36 +1,26 @@
-html.Div(
-    id='sidebar',
-    children=[                            
-        html.Div(
-            id='sidebar-content',
-            children=[
-                html.Div([
-                    html.I(className='bi bi-table'),
-                    html.Span('Tableau', className='sidebar-text')
-                ], id='tab-tableau', className='sidebar-link', n_clicks=0),
-                html.Div([
-                    html.I(className='bi bi-graph-up'),
-                    html.Span('Graphique', className='sidebar-text')
-                ], id='tab-graphique', className='sidebar-link', n_clicks=0),
-                html.Div([
-                    html.I(className='bi bi-map'),
-                    html.Span('Maps', className='sidebar-text')
-                ], id='tab-maps', className='sidebar-link', n_clicks=0),
-                html.Div([
-                    html.I(className='bi bi-gear'),
-                    html.Span('Fonctions', className='sidebar-text')
-                ], id='tab-fonctions', className='sidebar-link', n_clicks=0),
-                html.Div([
-                    html.I(className='bi bi-download'),
-                    html.Span('Exporter le fichier', className='sidebar-text')
-                ], id='tab-exporter', className='sidebar-link', n_clicks=0),
-                html.Div([
-                    html.I(className='bi bi-info-circle'),
-                    html.Span('Informations', className='sidebar-text')
-                ], id='tab-informations', className='sidebar-link', n_clicks=0),
-            ],
-            className='sidebar-content'
-        ),
-    ],
-    className='sidebar'
-)
+import dash
+from dash import html
+
+def generate_sidebar_item(icon_classname, title, div_id):
+    return html.Div(
+        [
+            html.I(className='bi ' + icon_classname),
+            html.Span(title, className='sidebar-text')
+        ], 
+        id = div_id, 
+        className='sidebar-link', 
+        n_clicks=0
+    )
+
+def generate_sidebar():
+    return html.Div(
+        id='sidebar', 
+        children=[
+            generate_sidebar_item('bi-table', 'Tableau', 'tab-tableau'),
+            generate_sidebar_item('bi-graph-up', 'Graphique', 'tab-graphique'),
+            generate_sidebar_item('bi-map', 'Maps', 'tab-maps'),
+            generate_sidebar_item('bi-gear', 'Fonctions', 'tab-fonctions'),
+            generate_sidebar_item('bi-download', 'Exporter le fichier', 'tab-exporter'),
+            generate_sidebar_item('bi-info-circle', 'Informations', 'tab-informations')
+        ]
+    )
