@@ -1,7 +1,6 @@
 #region LIB IMPORTS
 import dash
 import dash_bootstrap_components as dbc
-import pandas as pd
 import pathlib
 #endregion
 
@@ -26,10 +25,6 @@ app.config.suppress_callback_exceptions = True
 #region PATH
 BASE_PATH = pathlib.Path(__file__).parent.parent.resolve()
 RAW_DATA_PATH = BASE_PATH.joinpath("data").joinpath("raw").resolve()
-#endregion
-
-#region READ DATA
-df = pd.read_csv(RAW_DATA_PATH.joinpath("rawdata.csv"),delimiter=';',encoding='utf-8')
 #endregion
 
 #region APP LAYOUT

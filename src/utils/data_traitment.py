@@ -1,5 +1,4 @@
-
-
+"""
 #Fonction permettant de sauvegarder les données  
 def save_data(data, filename):
     with open(filename + '_settings.json', 'w') as f:#Nous pouvons choisir le nom du fichier de sauvegarde
@@ -10,3 +9,9 @@ def save_data(data, filename):
 def load_data(filename):
     with open(filename + '_settings.json', 'r') as f:
         return json.load(f)
+"""
+
+import pandas as pd
+from main import RAW_DATA_PATH
+
+df = pd.read_csv(RAW_DATA_PATH.joinpath("rawdata.csv"),delimiter=';',encoding='utf-8')

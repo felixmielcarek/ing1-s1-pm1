@@ -39,6 +39,7 @@ dcc.Loading(
 from dash import Input, Output, callback, ctx
 from pages.tableau import *
 from pages.informations import *
+from utils.data_traitment import df
 
 @callback(
     Output('page-content', 'children'),
@@ -56,15 +57,15 @@ def generate_page_content(tableau_click,
                           informations_click):
     match ctx.triggered_id:
         case 'tab-tableau':
-            return generate_tableau_page()
+            return generate_tableau_page(df)
         case 'tab-graphique':
-            return generate_tableau_page()
+            return generate_tableau_page(df)
         case 'tab-maps':
-            return generate_tableau_page()
+            return generate_tableau_page(df)
         case 'tab-fonctions':
-            return generate_tableau_page()
+            return generate_tableau_page(df)
         case 'tab-informations':
             return generate_informations_page()
         
         case _:
-            return generate_tableau_page()
+            return generate_tableau_page(df)
