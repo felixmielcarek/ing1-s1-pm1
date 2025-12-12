@@ -26,9 +26,10 @@ import glob
 import pandas as pd
 
 import  utils.Fonctions
+from utils.Fonctions import fitting_functions
 
-def affichage_graphique():
-    return html.Table(id='table-graph',children=[
+
+layout_graphique=html.Div([html.Table(id='table-graph',children=[
                 html.Tr([ 
                     html.Td([
         html.Div([
@@ -194,5 +195,5 @@ def affichage_graphique():
                      ],style={'display':'flex'}), ],style={'display':'inline-block'}),
 ])
      
-    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}), #1e2130
+    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}),]) #1e2130
 

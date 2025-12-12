@@ -1,7 +1,7 @@
 
 def Tableau(df,couleur_text,couleur_background):
     if df is None:
-        return None
+        return html.Div()
    # Calculer le résumé statistique et arrondir à 2 chiffres après la virgule
     summary = df.describe().round(2)
     # Ajouter une colonne pour expliquer chaque ligne

@@ -1,4 +1,9 @@
-
+from dash import Input, Output, State, callback, ctx
+import dash
+from dash import dcc, html, no_update
+import numpy as np
+import pandas as pd
+import dash_daq as daq
 def affectation_df(choix,df,global_df_brut,global_df_repared,global_df_loisdeau,global_df_decal,global_df_filtrees,global_df_mean,global_meandf_filtrees,global_repared_na,global_meandf_decal,global_meandf_repared,global_meandf_repared_na,global_df_fusionnées,global_meandf_fusionnées,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5):
     match choix :
         case 'DF_Brut': 
@@ -125,7 +130,7 @@ Fonctions de calcul
 - **mean(x)** : Moyenne.
 """
 
-fonctions_layout = html.Div([
+layout_fonctions = html.Div([
             html.Table(id='table-options',children=[ #Tableau visible dans l'onglet Options
                 html.Tr([ 
                     html.Td([

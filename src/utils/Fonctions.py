@@ -22,15 +22,11 @@ import inspect
 
 import shutil
 import sys
-
+import json
 import glob
 import pandas as pd
 
-import  utils.Fonctions
-
-
-
-def Tableau(df,couleur_text,couleur_background):
+def generate_tableau1(df,couleur_text,couleur_background):
     if df is None:
         return None
    # Calculer le résumé statistique et arrondir à 2 chiffres après la virgule
@@ -59,19 +55,19 @@ def Tableau(df,couleur_text,couleur_background):
         style_data_conditional=[
             {
                 'if': {'row_index': 'odd'},
-                'backgroundColor': couleur_background,
-                'color': couleur_text,
+                'backgroundColor': '#fdf2e9',
+                'color': 'black',
 
             },
             {
                 'if': {'row_index': 'even'},
-                'backgroundColor': couleur_background,
-                'color': couleur_text,
+                'backgroundColor': '#fdf2e9',
+                'color': 'black',
             },
         ],
         style_header={
-            'backgroundColor': couleur_background,
-            'color': couleur_text
+            'backgroundColor': '#fdf2e9',
+            'color': 'black'
         },
         style_table={'overflowX': 'auto'},
         style_cell={'width': 'auto'},
@@ -84,21 +80,21 @@ def Tableau(df,couleur_text,couleur_background):
     style_data_conditional=[
         {
             'if': {'row_index': 'odd'},
-            'backgroundColor': couleur_background,
-            'color': couleur_text,
+            'backgroundColor': '#fdf2e9',
+            'color': 'black',
             'width':'100%',
         },
         {
             'if': {'row_index': 'even'},
-            'backgroundColor': couleur_background,
-            'color': couleur_text,
+            'backgroundColor': '#fdf2e9',
+            'color': 'black',
             'width':'100%',
         },
 
     ],
     style_header={
-        'backgroundColor': couleur_background,
-        'color': couleur_text
+        'backgroundColor': '#fdf2e9',
+        'color': 'black'
     },   
     style_table={'overflowX': 'auto', 'overflowY': 'auto', 'maxHeight': '300px', 'width': '100%'}, 
     fixed_rows={'headers': True, 'data': 0},
@@ -112,66 +108,48 @@ def Tableau(df,couleur_text,couleur_background):
 
 #Fonctions permettant de savoir quel equation afficher
 def choix_equation(fitting_function, *popt):
-    match fitting_function:
-        case 'Linear':
-            return "y = {:.2e}x + {:.2e}".format(*popt)
-        case 'Cauchy':
-            return "y = {:.2e}+{:.2e}/x^2 + {:.2e}/x^4".format(*popt)
-        case 'Cubic':
-            return "y = {:.2e} * x^3 + {:.2e} * x^2 + {:.2e} * x + {:.2e}".format(*popt)
-        
-        case 'Damped Function':
-            return "y = {:.2e}e^(-{:.2e}x) + {:.2e}".format(*popt)
-        
-        case 'Damped Oscillator':
-            return "y = {:.2e}e^(-{:.2e}x) * sin({:.2e} * x+{:.2e}) + {:.2e}".format(*popt)
-        
-        case 'Exponential':
-            return "y = {:.2e}e^({:.2e}x)+{:.2e}".format(*popt)
-        
-        case 'Gaussian':
-            return "y = {:.2e}e^(-(x - {:.2e})^2 / (2 * {:.2e}^2))+{:.2e}".format(*popt)
-        
-        case 'Inverse':
-            return "y = {:.2e} / ({:.2e} + x )".format(*popt)
-        
-        case 'Logistic':
-            return "y = {:.2e} / (1 + {:.2e}e^(-{:.2e}x))".format(*popt)
-        
-        case 'Lorentzian':
-            A, omega0, beta, C = popt
-            return "y = {:.2e} * sqrt((({:.2e}^2 - x^2)^2 + 4 * x^2 * {:.2e}^2)) + {:.2e}".format(A, omega0, beta, C)
-
-        
-        case 'Natural Log':
-            return "y = {:.2e} * ln( x * {:.2e} )".format(*popt)
-        
-        case 'Oscillator':
-            return "y = {:.2e} * sin(2π * {:.2e} * x + {:.2e})+{:.2e}".format(*popt)
-        
-        case 'Poisson':
-            return "y = {:.2e} * e^(-{:.2e}) * ({:.2e})^x / x!".format(popt[0], popt[1], popt[1])
-        
-        case 'Power Law':
-            return "y = {:.2e} * x^{:.2e}".format(*popt)
-        
-        case 'Power Law with Offsets':
-            return "y = {:.2e} * (x - {:.2e})^{:.2e} + {:.2e}".format(*popt)
-        
-        case 'Quadratic':
-            return "y = {:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
-        case'Quartic':
-            return "y = {:.2e}x^4+{:.2e}x^3 +{:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
-
-        case 'Stokes Law':
-            k0, a0, K1 = popt
-            return "y = ({:.2e} / (18 * {:.2e})) * x^2 * (1 - 2.1 * x / {:.2e})".format(k0, a0, K1)
-
-        
-        case 'Two Slit Interference':
-            val_x0 = popt[3]
-            formatted_val_x0 = "{:.2e}".format(val_x0)
-            return "y = {:.2e} * sinc^2({:.2e} * (x - {}) / π) * cos^2({:.2e} * (x - {:.2e})) + {:.2e}".format(popt[0], popt[1], formatted_val_x0, popt[2], val_x0, popt[4])
+    if fitting_function == 'Linear':
+        return "y = {:.2e}x + {:.2e}".format(*popt)
+    elif fitting_function == 'Cauchy':
+        return "y = {:.2e}+{:.2e}/x^2 + {:.2e}/x^4".format(*popt)
+    elif fitting_function == 'Cubic':
+        return "y = {:.2e} * x^3 + {:.2e} * x^2 + {:.2e} * x + {:.2e}".format(*popt)
+    elif fitting_function == 'Damped Function':
+        return "y = {:.2e}e^(-{:.2e}x) + {:.2e}".format(*popt)
+    elif fitting_function == 'Damped Oscillator':
+        return "y = {:.2e}e^(-{:.2e}x) * sin({:.2e} * x+{:.2e}) + {:.2e}".format(*popt)
+    elif fitting_function == 'Exponential':
+        return "y = {:.2e}e^({:.2e}x)+{:.2e}".format(*popt)
+    elif fitting_function == 'Gaussian':
+        return "y = {:.2e}e^(-(x - {:.2e})^2 / (2 * {:.2e}^2))+{:.2e}".format(*popt)
+    elif fitting_function == 'Inverse':
+        return "y = {:.2e} / ({:.2e} + x )".format(*popt)
+    elif fitting_function == 'Logistic':
+        return "y = {:.2e} / (1 + {:.2e}e^(-{:.2e}x))".format(*popt)
+    elif fitting_function == 'Lorentzian':
+        A, omega0, beta, C = popt
+        return "y = {:.2e} * sqrt((({:.2e}^2 - x^2)^2 + 4 * x^2 * {:.2e}^2)) + {:.2e}".format(A, omega0, beta, C)
+    elif fitting_function == 'Natural Log':
+        return "y = {:.2e} * ln( x * {:.2e} )".format(*popt)
+    elif fitting_function == 'Oscillator':
+        return "y = {:.2e} * sin(2π * {:.2e} * x + {:.2e})+{:.2e}".format(*popt)
+    elif fitting_function == 'Poisson':
+        return "y = {:.2e} * e^(-{:.2e}) * ({:.2e})^x / x!".format(popt[0], popt[1], popt[1])
+    elif fitting_function == 'Power Law':
+        return "y = {:.2e} * x^{:.2e}".format(*popt)
+    elif fitting_function == 'Power Law with Offsets':
+        return "y = {:.2e} * (x - {:.2e})^{:.2e} + {:.2e}".format(*popt)
+    elif fitting_function == 'Quadratic':
+        return "y = {:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
+    elif fitting_function == 'Quartic':
+        return "y = {:.2e}x^4+{:.2e}x^3 +{:.2e}x^2 + {:.2e}x + {:.2e}".format(*popt)
+    elif fitting_function == 'Stokes Law':
+        k0, a0, K1 = popt
+        return "y = ({:.2e} / (18 * {:.2e})) * x^2 * (1 - 2.1 * x / {:.2e})".format(k0, a0, K1)
+    elif fitting_function == 'Two Slit Interference':
+        val_x0 = popt[3]
+        formatted_val_x0 = "{:.2e}".format(val_x0)
+        return "y = {:.2e} * sinc^2({:.2e} * (x - {}) / π) * cos^2({:.2e} * (x - {:.2e})) + {:.2e}".format(popt[0], popt[1], formatted_val_x0, popt[2], val_x0, popt[4])
 
 def initialiser_variables_globales():
     global global_df_brut
@@ -280,50 +258,60 @@ def load_data(filename):
         return json.load(f)
 
 def affectation_df(choix,df,global_df_brut,global_df_repared,global_df_loisdeau,global_df_decal,global_df_filtrees,global_df_mean,global_meandf_filtrees,global_repared_na,global_meandf_decal,global_meandf_repared,global_meandf_repared_na,global_df_fusionnées,global_meandf_fusionnées,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5):
-    match choix :
-        case 'DF_Brut': 
-            global_df_brut=df
-        
-        case 'df_fusionnées' if df is not None: 
-            global_df_fusionnées=df
-        case 'df_mean' if df is not None:
-            global_df_mean=df
-                
-        case 'meandf_filtrees':
-            global_meandf_filtrees=df
-        case 'df_filtrees':
-            global_df_filtrees=df
-        case 'df_1':
-            global_df_1=df
-        case 'df_2':
-            global_df_2=df
-
-        case 'df_3':
-            global_df_3=df
-
-        case 'df_4':
-            global_df_4=df
-
-        case 'df_5':
-            global_df_5=df
-
-        case 'meandf_1':
-            global_meandf_1=df
-
-        case 'meandf_2':
-            global_meandf_2=df
-
-        case 'meandf_3':
-            global_meandf_3=df
-
-        case 'meandf_4':
-           global_meandf_4=df
-
-        case 'meandf_5':
-            global_meandf_5=df
+    if choix == 'DF_Brut':
+        global_df_brut=df
+    elif choix == 'df_fusionnées' and df is not None:
+        global_df_fusionnées=df
+    elif choix == 'df_mean' and df is not None:
+        global_df_mean=df
+    elif choix == 'meandf_filtrees':
+        global_meandf_filtrees=df
+    elif choix == 'df_filtrees':
+        global_df_filtrees=df
+    elif choix == 'df_1':
+        global_df_1=df
+    elif choix == 'df_2':
+        global_df_2=df
+    elif choix == 'df_3':
+        global_df_3=df
+    elif choix == 'df_4':
+        global_df_4=df
+    elif choix == 'df_5':
+        global_df_5=df
+    elif choix == 'meandf_1':
+        global_meandf_1=df
+    elif choix == 'meandf_2':
+        global_meandf_2=df
+    elif choix == 'meandf_3':
+        global_meandf_3=df
+    elif choix == 'meandf_4':
+        global_meandf_4=df
+    elif choix == 'meandf_5':
+        global_meandf_5=df
 
 
- 
+fitting_functions = {
+    'Linear': linear,
+    'Cauchy': cauchy,
+    'Cubic': cubic,
+    'Damped Function': damped,
+    'Damped Oscillator':damped_oscillator,
+    'Exponential': exponential,
+    'Gaussian': gaussian,
+    'Inverse': inverse,
+    'Logistic': logistic,
+    'Lorentzian': lorentzian,
+    'Natural Log': natural_log,
+    'Oscillator': oscillator,
+    'Poisson': poisson,
+    'Power Law': power_law,
+    'Power Law with Offsets': power_law_offset,
+    'Quadratic': quadratic,
+    'Quartic': Quartic,
+    'Stokes Law': stokes_law,
+    'Two Slit Interference': two_slit_interference,
+    'Courbe moyennée 24h': smooth_y_values,
+} 
 
 #Fonction permettant de recrée les données manquantes temporel
 def interpolate(df,mask,pas,ordre):
@@ -343,64 +331,42 @@ def interpolate(df,mask,pas,ordre):
     return df
 
 #Fonction permettant de choisir quel data frame utiliser
-def choix_df(choix,global_df_brut,global_df_repared,global_df_mean,global_repared_na,global_meandf_decal,global_meandf_repared,global_meandf_repared_na,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5,global_fusion_data):
-    match choix:
-        case 'DF_Brut':
-            df = global_df_brut
-
+def choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5):
+    
+    if choix == 'df_brutes':
+        df = global_df_brut
         
-        case 'df_mean':
-            df = global_df_mean
-        
-        case 'meandf_repared':
-            df = global_meandf_repared
-        
-        case 'df_fusionnées' :
-            df = global_df_fusionnées
-        
-        case 'meandf_fusionnées':
-            df = global_meandf_fusionnées
-               
-        case 'df_filtrees':
-            df = global_df_filtrees
-        
-        case 'meandf_filtrees':
-            df = global_meandf_filtrees
-
-        case 'df_1':
-            df=global_df_1
-
-        case 'df_2':
-            df=global_df_2
-
-        case 'df_3':
-            df=global_df_3
-
-        case 'df_4':
-            df=global_df_4
-
-        case 'df_5':
-            df=global_df_5
-
-        case 'meandf_1':
-            df=global_meandf_1
-
-        case 'meandf_2':
-            df=global_meandf_2
-
-        case 'meandf_3':
-            df=global_meandf_3
-
-        case 'meandf_4':
-            df=global_meandf_4
-
-        case 'meandf_5':
-            df=global_meandf_5
-
-   
-    #df = dd.DataFrame(df)
-    #df = df.repartition(npartitions=desired_number_of_partitions)
-    return df
+    elif choix == 'df_mean':
+        df = global_df_mean
+    elif choix == 'meandf_repared':
+        df = global_meandf_repared
+    elif choix == 'df_fusionnées':
+        df = global_df_fusionnées
+    elif choix == 'meandf_fusionnées':
+        df = global_meandf_fusionnées
+    elif choix == 'df_1':
+        df = global_df_1
+    elif choix == 'df_2':
+        df = global_df_2
+    elif choix == 'df_3':
+        df = global_df_3
+    elif choix == 'df_4':
+        df = global_df_4
+    elif choix == 'df_5':
+        df = global_df_5
+    elif choix == 'meandf_1':
+        df = global_meandf_1
+    elif choix == 'meandf_2':
+        df = global_meandf_2
+    elif choix == 'meandf_3':
+        df = global_meandf_3
+    elif choix == 'meandf_4':
+        df = global_meandf_4
+    elif choix == 'meandf_5':
+        df = global_meandf_5
+    if df is not None:
+       
+        return df
 
 def create_scatter_trace(x, y, name, mode='markers', secondary_y=False, **kwargs):
     """
