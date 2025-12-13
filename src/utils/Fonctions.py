@@ -26,6 +26,92 @@ import json
 import glob
 import pandas as pd
 
+#Fonction permettant de recrée les données manquantes temporel
+def interpolate(df,mask,pas,ordre):
+    ordre=int(ordre)
+    for i in mask[mask].index:
+        diff = df.loc[i, 'pas']
+        start = df.loc[i-1, 'temps']
+        while diff > pas: #Recreation des lignes manquantes
+            start = start + pd.Timedelta(seconds=pas)
+            diff -= pas
+            df.loc[df.index.max() + 1] = {'temps': start}
+    df = df.sort_values('temps').reset_index(drop=True)
+    # Compléter les NaN avec la fonction interpolate option polynomiale
+    for col in df.columns:
+        if df[col].dtype == np.number:
+            df[col] = df[col].interpolate(method='polynomial', order=ordre)
+    return df
+
+def apply_filters(df, col, conditions, thresholds, condition_colonne, comp_colonne):
+    """
+    Applique les filtres sur le DataFrame.
+    """
+    filtered_df = df.copy()
+    
+    if col is not None and conditions is not None and thresholds is not None:
+        for col_name, condition, threshold in zip(col, conditions, thresholds):
+            if col_name is not None and condition is not None and threshold is not None:
+                if isinstance(threshold, str) and threshold.replace('.', '', 1).isdigit():
+                    threshold = float(threshold)
+                
+                if condition == 'gt':
+                    filtered_df = filtered_df[filtered_df[col_name] > threshold]
+                elif condition == 'eq':
+                    filtered_df = filtered_df[filtered_df[col_name] == threshold]
+                elif condition == 'lt':
+                    filtered_df = filtered_df[filtered_df[col_name] < threshold]
+    
+    if condition_colonne is not None and comp_colonne is not None and len(comp_colonne) == 2:
+        if condition_colonne == 'gt':
+            filtered_df = filtered_df[filtered_df[comp_colonne[0]] > filtered_df[comp_colonne[1]]]
+        elif condition_colonne == 'eq':
+            filtered_df = filtered_df[filtered_df[comp_colonne[0]] == filtered_df[comp_colonne[1]]]
+        elif condition_colonne == 'lt':
+            filtered_df = filtered_df[filtered_df[comp_colonne[0]] < filtered_df[comp_colonne[1]]]
+    
+    return filtered_df
+
+message = """
+Fonctions de Racine et Puissance
+- **sqrt(x)** : Calcule la racine carrée de chaque élément de l'array.
+- **cbrt(x)** : Calcule la racine cubique de chaque élément.
+- **power(x, y)** : Élève chaque élément de x à la puissance y.
+
+Fonctions Exponentielles et Logarithmiques
+- **exp(x)** : Calcule l’exponentielle de chaque élément.
+- **expm1(x)** : Calcule exp(x) - 1 pour chaque élément.
+- **log(x)** : Calcule le logarithme naturel de chaque élément.
+- **log10(x)** : Calcule le logarithme en base 10.
+- **log2(x)** : Calcule le logarithme en base 2.
+- **log1p(x)** : Calcule log(1 + x) pour chaque élément.
+
+Fonctions Trigonométriques
+- **sin(x)** : Calcule le sinus de chaque élément.
+- **cos(x)** : Calcule le cosinus de chaque élément.
+- **tan(x)** : Calcule la tangente de chaque élément.
+- **arcsin(x)** : Calcule l’arc sinus (inverse du sinus).
+- **arccos(x)** : Calcule l’arc cosinus (inverse du cosinus).
+- **arctan(x)** : Calcule l’arc tangente (inverse de la tangente).
+
+Fonctions Hyperboliques
+- **sinh(x)** : Calcule le sinus hyperbolique de chaque élément.
+- **cosh(x)** : Calcule le cosinus hyperbolique.
+- **tanh(x)** : Calcule la tangente hyperbolique.
+- **arcsinh(x)** : Calcule l’arc sinus hyperbolique (inverse du sinus hyperbolique).
+- **arccosh(x)** : Calcule l’arc cosinus hyperbolique (inverse du cosinus hyperbolique).
+- **arctanh(x)** : Calcule l’arc tangente hyperbolique (inverse de la tangente hyperbolique).
+
+Fonctions de calcul
+- **cumsum(x)** : Somme cumulée.
+- **min(x)** : Minimum.
+- **max(x)** : Maximum.
+- **mean(x)** : Moyenne.
+"""
+
+
+
+
 def generate_tableau1(df,couleur_text,couleur_background):
     if df is None:
         return None
@@ -103,7 +189,7 @@ def generate_tableau1(df,couleur_text,couleur_background):
 
 
     # Retourner les deux tableaux dans une Div, avec une ligne de rupture entre eux
-    return html.Div([df_table, html.Br(),html.Br(), summary_table])
+    return html.Div([html.Br(), df_table, html.Br(),html.Br(), summary_table])
     
 
 #Fonctions permettant de savoir quel equation afficher

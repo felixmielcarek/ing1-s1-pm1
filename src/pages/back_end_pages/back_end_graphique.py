@@ -8,32 +8,31 @@ from plotly.subplots import make_subplots
 from scipy.optimize import curve_fit
 from scipy.special import factorial
 import base64
-import utils.Fonctions as Fonctions
-from utils.Fonctions import choix_df
+from utils.Fonctions import *
 from utils.data_traitment import *
 
 # Dictionnaire des fonctions
 fitting_functions = {
-    'Linear': Fonctions.linear,
-    'Cauchy': Fonctions.cauchy,
-    'Cubic': Fonctions.cubic,
-    'Damped Function': Fonctions.damped,
-    'Damped Oscillator': Fonctions.damped_oscillator,
-    'Exponential': Fonctions.exponential,
-    'Gaussian': Fonctions.gaussian,
-    'Inverse': Fonctions.inverse,
-    'Logistic': Fonctions.logistic,
-    'Lorentzian': Fonctions.lorentzian,
-    'Natural Log': Fonctions.natural_log,
-    'Oscillator': Fonctions.oscillator,
-    'Poisson': Fonctions.poisson,
-    'Power Law': Fonctions.power_law,
-    'Power Law with Offsets': Fonctions.power_law_offset,
-    'Quadratic': Fonctions.quadratic,
-    'Quartic': Fonctions.Quartic,
-    'Stokes Law': Fonctions.stokes_law,
-    'Two Slit Interference': Fonctions.two_slit_interference,
-    'Courbe moyennée 24h': Fonctions.smooth_y_values,
+    'Linear': linear,
+    'Cauchy': cauchy,
+    'Cubic': cubic,
+    'Damped Function': damped,
+    'Damped Oscillator': damped_oscillator,
+    'Exponential': exponential,
+    'Gaussian': gaussian,
+    'Inverse': inverse,
+    'Logistic': logistic,
+    'Lorentzian': lorentzian,
+    'Natural Log': natural_log,
+    'Oscillator': oscillator,
+    'Poisson': poisson,
+    'Power Law': power_law,
+    'Power Law with Offsets': power_law_offset,
+    'Quadratic': quadratic,
+    'Quartic': Quartic,
+    'Stokes Law': stokes_law,
+    'Two Slit Interference': two_slit_interference,
+    'Courbe moyennée 24h': smooth_y_values,
 }
 #region DROPDWON AXES
 @callback(
@@ -64,20 +63,16 @@ def taille_auto_axes(val_y, valy2):
 @callback(
      Output('y-axis','value',allow_duplicate=True),#Il faut mettre allow_duplicate=True pour pouvoir avoir plusieurs output avec des memes variables 
      Output('y2-axis','value',allow_duplicate=True),
-     Output('x-axis','options',allow_duplicate=True),
      Output('x-axis', 'value',allow_duplicate=True),
      Input('active-tab', 'data'),
      Input('choix_df','value'),
-     Input('filtre','value'),
-     Input('Regression', 'value'),
-     Input('fusion','value'),
      State('y-axis','value'),
      State('y2-axis','value'),
      State('x-axis','value'),
      prevent_initial_call=True
      
      )
-def value_axe(tab,choix,filtre,regression,fusion,y_value,y2_value,x_axis):
+def value_axe(tab,choix,y_value,y2_value,x_axis):
     if tab=='graphique':
 
         df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
@@ -87,31 +82,17 @@ def value_axe(tab,choix,filtre,regression,fusion,y_value,y2_value,x_axis):
             y_value=[df.columns[0],df.columns[1]]
             y2_value=[df.columns[1],df.columns[0]]
             x_value=df.columns[1]
-            return y_value,y2_value,dash.no_update,x_value
+            return y_value,y2_value,x_value
     
         if df is not None and ((y_value and y2_value and x_axis) is None): #Si  la variable df n'est pas nul mais que y et y 2 sont nul alors on leur attribue des valeurs par defauts 
-            #print('\n\n\n\n\n if df is not None and (((y_value and y2_value and x_axis) is None) and ')
 
-            #print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n MAUVAIS IF POUR LES VALUES \n\n\n\n\n\n\n\n\n")   
-            y_value=[df.columns[7],df.columns[8]]
-            y2_value=[df.columns[6],df.columns[5]]
-            x_value=[df.columns[1]]
-            return y_value,y2_value,dash.no_update,x_value
-           
-       
-        if regression=='Reg_avec' :
-            #print("\n\n Pas probleme")
-            
-            x_axis_options=[{'label': i, 'value': i} for i in df.columns]
-                        
-            return y_value,y2_value,x_axis_options,dash.no_update
-        else:
-            x_axis_options=[{'label': i, 'value': i} for i in df.columns]
-            return y_value,y2_value,x_axis_options,dash.no_update
-            
+            y_value=[df.columns[0],df.columns[1]]
+            y2_value=[df.columns[1],df.columns[0]]
+            x_value=df.columns[1]
+            return y_value,y2_value,x_value
 
     if tab!='graphique' :
-            return dash.no_update,dash.no_update,dash.no_update,dash.no_update
+            return dash.no_update,dash.no_update,dash.no_update
     
 @callback(
     Output('x-axis','options'),
@@ -154,6 +135,7 @@ def choix_des_axes(tab,choix):
     
 #endregion 
 
+#region SLIDERS ET GRAPHIQUE
 #Callback permettant d'afficher ou non les slider pour la clarter des points, de la taille des points et de la police.Mais aussi du graphique vierge
 @callback(
  Output('graph','style'),
@@ -199,42 +181,9 @@ def slider(style,x,y,value,tab):
         return graph_style,opt_l,opt_h,"Unité : ","Unité : ","Unité : ",{'display':'inline-block','margin-left':'5px'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},axe,{'display':'inline-block'},text_graph
     if tab!='graphique' or ((x and y is None) or global_df_brut is None):
         graph_style={'display':'none'}
+    
     return graph_style,None,None,None,None,None,{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},None
 
-
-@callback(
-    Output('y-axis', 'value', allow_duplicate=True),
-    Input('all_selec', 'n_clicks'),
-    Input('y-axis', 'value'),
-    Input('x-axis', 'value'),
-    State('choix_df', 'value'),
-    Input('fusion', 'value'),
-
-    prevent_initial_call=True
-)
-def select_all_options(n_clicks, y_axis, x_axis, choix, fusion):
-    ctx = dash.callback_context
-    if not ctx.triggered:
-        # Aucun bouton n'a été cliqué.
-        button_id = 'No clicks yet'
-    else:
-        # Obtenez l'id du bouton qui a été cliqué.
-        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-    
-    if button_id == 'all_selec':
-
-        df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
-        if x_axis is not None:
-            # Récupère toutes les valeurs des colonnes
-            all_values = df.columns.tolist()
-
-            # Filtre les valeurs déjà sélectionnées par l'autre dropdown
-            dropdown1_values = y_axis or []
-            dropdown1_selectable = [val for val in all_values if val not in x_axis]
-
-            return dropdown1_selectable
-    else:
-        return dash.no_update
 
 #Appcallback qui gere l'ajout des courbes au graphique 
 @callback(
@@ -258,7 +207,7 @@ def select_all_options(n_clicks, y_axis, x_axis, choix, fusion):
     Input('exclure','value'),
     Input('columns','value'),
     Input('type_graph','value'),
-    Input('points', 'value'),
+    
     Input('choix_df', 'value'),
     Input('x-axis', 'value'),
     Input('y-axis', 'value'),
@@ -267,7 +216,7 @@ def select_all_options(n_clicks, y_axis, x_axis, choix, fusion):
     Input('point-opacity-slider', 'value'),
     Input('font-size-slider', 'value'),
     Input('Regression', 'value'),
-    Input('fusion','value'),
+    
     Input('type_curve_fitting','value'),
     State('graph', 'relayoutData'),
     State('threshold', 'value'),#
@@ -286,10 +235,10 @@ def select_all_options(n_clicks, y_axis, x_axis, choix, fusion):
     State('threshold3','type'),
     State('comp_colonne','value'),
     State('condition_colonne','value'),
-    prevent_initial_call=True
+    
 
 )
-def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, height, tab, condition_filtre, submit, reference, profondeur, exclure, columns, graph, value, choix, x_axis, y_axis, y2_axis, point_size, point_opacity, font_size, regression, fusion, fitting_function, relayoutData, threshold1, condition1, selected_color, condition2, condition3, threshold2, threshold3, titre_graphique, type_threshold, type_threshold2, type_threshold3, comp_colonne, condition_colonne):
+def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, height, tab, condition_filtre, submit, reference, profondeur, exclure, columns, graph,  choix, x_axis, y_axis, y2_axis, point_size, point_opacity, font_size, regression,  fitting_function, relayoutData, threshold1, condition1, selected_color, condition2, condition3, threshold2, threshold3, titre_graphique, type_threshold, type_threshold2, type_threshold3, comp_colonne, condition_colonne):
     if x_unit is None:
         x_unit = ''
     if y_unit is None:
@@ -403,7 +352,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
         y_data = y_data[mask]
         
         if fitting_function == 'Courbe moyennée 24h':
-            x_fit, y_fit = Fonctions.smooth_y_values(filtered_df, x_axis, y_axis[0])
+            x_fit, y_fit = smooth_y_values(filtered_df, x_axis, y_axis[0])
             fig.add_trace(
                 go.Scatter(x=x_fit, y=y_fit, name=f'Regression {y_axis[0]}: ', mode='lines', line=dict(color='black', width=3)),
                 secondary_y=False,
@@ -413,7 +362,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
         else:
             popt, _ = curve_fit(fitting_functions[fitting_function], x_data, y_data)
             y_fit = fitting_functions[fitting_function](x_data, *popt)
-            equation = Fonctions.choix_equation(fitting_function, *popt)
+            equation = choix_equation(fitting_function, *popt)
             fitting_df = pd.DataFrame({f"{fitting_function}_{y_axis[0]}": y_fit.tolist()})
             
             # Vérifiez l'existence de la colonne 'informations'
@@ -423,7 +372,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
             fitting_df.loc[0, 'informations'] = equation
             for i in range(len(popt)):
                 fitting_df.loc[i + 1, 'informations'] = f'c{i+1}={popt[i]}'
-            fitting_df.loc[len(popt) + 1, 'informations'] = f'r2={Fonctions.calculate_r_squared(x_data, y_data, fitting_functions[fitting_function], popt)}'
+            fitting_df.loc[len(popt) + 1, 'informations'] = f'r2={calculate_r_squared(x_data, y_data, fitting_functions[fitting_function], popt)}'
             if x_data is not ( 'Date' or 'Heure' or 'pas' or 'temps_secondes_cumulée' or 'temps_heure_cumulée' or 'temps_heure_24'):
                 # Supposons que x_fit et y_fit sont deux listes de même longueur
                 x_data, y_fit = zip(*sorted(zip(x_data, y_fit)))
@@ -497,6 +446,43 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
         return fig, base64.b64encode(fitting_df.to_parquet()).decode()
         
     return fig, no_update
+#endregion
+
+@callback(
+    Output('y-axis', 'value', allow_duplicate=True),
+    Input('all_selec', 'n_clicks'),
+    Input('y-axis', 'value'),
+    Input('x-axis', 'value'),
+    State('choix_df', 'value'),
+    
+
+    prevent_initial_call=True
+)
+def select_all_options(n_clicks, y_axis, x_axis, choix):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        # Aucun bouton n'a été cliqué.
+        button_id = 'No clicks yet'
+    else:
+        # Obtenez l'id du bouton qui a été cliqué.
+        button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+    
+    if button_id == 'all_selec':
+
+        df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+        if x_axis is not None:
+            # Récupère toutes les valeurs des colonnes
+            all_values = df.columns.tolist()
+
+            # Filtre les valeurs déjà sélectionnées par l'autre dropdown
+            dropdown1_values = y_axis or []
+            dropdown1_selectable = [val for val in all_values if val not in x_axis]
+
+            return dropdown1_selectable
+    else:
+        return dash.no_update
+
+
 
 
 @callback(
@@ -507,18 +493,18 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
     Output('avec_condition','style'),
     
     Input('y-axis','value'),
-    State('upload-data', 'filename'),
+    
     prevent_initial_call=True
 )
-def filtre_graphique(y, filename):
+def filtre_graphique(y):
     
     if global_df_brut is not None:
         if y == 'prof':
-            return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : {filename}", {'display':'inline-block'}
+            return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
         elif y == 'filtrage':
-            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : {filename}", {'display':'inline-block'}
+            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
         else:
-            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : {filename}", {'display':'inline-block'}
+            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
     
     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 

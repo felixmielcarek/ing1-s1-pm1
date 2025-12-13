@@ -32,6 +32,7 @@ from components.sidebar import *
 from utils.Fonctions import *
 from pages.tableau import *
 from pages.graphique import layout_graphique
+from pages.fonctions import layout_fonctions
 # Moved to end to avoid circular import: from pages.back_end_pages.back_end_graphique import *
 
 #endregion
@@ -73,37 +74,43 @@ app.layout = html.Div(style={
     id="loading",
     type="dot",
     children=[
-        dcc.Store(id='active-tab'),]),
+        dcc.Store(id='active-tab'),
+         dcc.Store(id='stock_curve_fitting'),
+           
+        dcc.Store(id='selected_color'),
+        dcc.Store(id='alert-displayed'),
+        dcc.Store(id='alert-displayed_NA'),
+        dcc.Store(id='col_na'),
+        dcc.Store(id='df_ok'),
+            
+        dcc.Store(id='store-units'),
+                
+        dcc.Store(id='add-fichier'),
+        dcc.Store(id='stock_temp_ext'),
+        dcc.Store(id='stock_tdep'),
+        dcc.Store(id='manque_temporel_data'),
+       
+        dcc.Store(id='output_regen'),
+        dcc.Store(id='output_regen_na'),
+        dcc.Store(id='calcul_mean'),
+        dcc.Store(id='rename_col'),
+        dcc.Store(id='fichier_fusion'),
         
-       html.Table(
-        style={'width': '100%', 'borderCollapse': 'collapse'}, # Le tableau prend 50% de la largeur de l'écran
+        dcc.Store(id='filtrage_df_ok'),
         
-        children=[
-            # LIGNE 1
-            html.Tr([
-                html.Td(style={'vertical-align': 'top'},children=[
-                    html.Div(id='titre-page'),
-                    dcc.Dropdown(
-                            id='choix_df',
-                            options=[{'label':'Données Brutes','value':'df_brutes'}],value='df_brutes',
-                            style={'display':'block','width':'200px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left'}
-                        ),
-                                        
-                ])
+        
         ]),
-            
-            # LIGNE 2
-            html.Tr([
-                html.Td([
-                    html.Div(id='page-content',style={'margin':'auto'}),
-                    
-                ])
-            ]),
-            
-                    
-        ]
-    ),
+
+        dcc.Dropdown(
+                id='choix_df',
+                options=[{'label':'Données Brutes','value':'df_brutes'}],value='df_brutes',
+                style={'display':'block','height':'40px','width':'200px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left','margin-left':'5%'}
+            ),
+         html.Div(id='page-content'),
+         html.Br(),
+         html.Br(),
     layout_graphique,
+    layout_fonctions,
 
     ], id='main-content')
 #endregion
@@ -112,7 +119,6 @@ app.layout = html.Div(style={
 from pages.back_end_pages.back_end_graphique import *
 @callback(
     Output('page-content', 'children'),
-    Output('titre-page','children'),
     Output('active-tab', 'data'),
     Input('tab-tableau','n_clicks'),
     Input('tab-graphique','n_clicks'),
@@ -126,18 +132,16 @@ def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_cli
     match ctx.triggered_id:
         case 'tab-tableau':
             
-            return generate_tableau1(newdf,'black','#f9f9f9'),"Page Tableau ",'tableau'
+            return generate_tableau1(newdf,'black','#f9f9f9'),'tableau'
         case 'tab-graphique':
-            return None,"Page Graphique",'graphique'
+            return None,'graphique'
         case 'tab-maps':
-            return html.Div(),"Page Maps",'maps'
+            return None,'maps'
         case 'tab-fonctions':
-            return None,"Page Fonctions",'options'
-        case 'tab-informations':
-            return html.Div(),"Page Informations",'informations'
-        
+            return None,'options'
+                
         case _:
-            return html.Div(),"",dash.no_update
+            return None,dash.no_update
 #region RUN
 if __name__ == '__main__':
     app.run(debug=True)

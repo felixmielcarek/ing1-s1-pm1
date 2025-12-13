@@ -29,7 +29,7 @@ import  utils.Fonctions
 from utils.Fonctions import fitting_functions
 
 
-layout_graphique=html.Div([html.Table(id='table-graph',children=[
+layout_graphique=html.Table(id='table-graph',children=[
                 html.Tr([ 
                     html.Td([
         html.Div([
@@ -195,5 +195,5 @@ layout_graphique=html.Div([html.Table(id='table-graph',children=[
                      ],style={'display':'flex'}), ],style={'display':'inline-block'}),
 ])
      
-    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}),]) #1e2130
+    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}) #1e2130
 
