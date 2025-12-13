@@ -3,17 +3,18 @@ import dash.html as html
 def generate_sidebar_item(icon_classname, title, div_id):
     return html.Div(
         [
-            html.Div(className='bi ' + icon_classname),
+            html.Div(className='sidebar-icon bi ' + icon_classname),
             html.Span(title, className='sidebar-text')
         ], 
         id = div_id, 
-        className='sidebar-link', 
+        className='sidebar-item', 
         n_clicks=0
     )
 
 def generate_sidebar():
     return html.Div(
-        id='sidebar', 
+        id='sidebar',
+        className='fs-2',
         children=[
             generate_sidebar_item('bi-table', 'Tableau', 'tab-tableau'),
             generate_sidebar_item('bi-graph-up', 'Graphique', 'tab-graphique'),
