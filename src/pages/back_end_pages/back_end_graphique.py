@@ -10,7 +10,7 @@ from scipy.special import factorial
 import base64
 from utils.Fonctions import *
 from utils.data_traitment import *
-
+import pyarrow
 # Dictionnaire des fonctions
 fitting_functions = {
     'Linear': linear,
@@ -154,7 +154,7 @@ def choix_des_axes(tab,choix):
  
  Output('titre_graphique','style'),
  Output('texte_titre_graph','children'),
- 
+ Output('type_curve_fitting','style'),
  Input('graph','style'),
  Input('x-axis','value'),
  Input('y-axis','value'),
@@ -178,11 +178,11 @@ def slider(style,x,y,value,tab):
             axe= {'display':'inline-block','width':'70%'} #Dans ce if les slider s'afficheront car nuage de point a ete selectionner
         else:
             axe= {'display':'none'} #Dans ce if les slider s'afficheront car nuage de point a ete selectionner
-        return graph_style,opt_l,opt_h,"Unité : ","Unité : ","Unité : ",{'display':'inline-block','margin-left':'5px'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},axe,{'display':'inline-block'},text_graph
+        return graph_style,opt_l,opt_h,"Unité : ","Unité : ","Unité : ",{'display':'inline-block','margin-left':'5px'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},axe,{'display':'inline-block'},text_graph,{'display':'block','width':'80%','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px'},
     if tab!='graphique' or ((x and y is None) or global_df_brut is None):
         graph_style={'display':'none'}
     
-    return graph_style,None,None,None,None,None,{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},None
+    return graph_style,None,None,None,None,None,{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},None,{'display':'none'}
 
 
 #Appcallback qui gere l'ajout des courbes au graphique 
@@ -493,20 +493,23 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
     Output('avec_condition','style'),
     
     Input('y-axis','value'),
+    Input('active-tab', 'data'),
     
     prevent_initial_call=True
 )
-def filtre_graphique(y):
-    
-    if global_df_brut is not None:
-        if y == 'prof':
-            return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
-        elif y == 'filtrage':
-            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
-        else:
-            return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
-    
-    return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+def filtre_graphique(y,tab):
+    if (tab=='graphique'):
+        if (global_df_brut is not None) :
+            if y == 'prof':
+                return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+            elif y == 'filtrage':
+                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+            else:
+                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+        
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+    else:
+        return {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, None, {'display':'none'}
 
 
 #Callback gerant le stockage des unités et la taille du graphique

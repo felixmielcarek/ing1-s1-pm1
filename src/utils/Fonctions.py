@@ -108,88 +108,99 @@ Fonctions de calcul
 - **max(x)** : Maximum.
 - **mean(x)** : Moyenne.
 """
+#Permet de convertir les données en des numériques 
+def convert_to_numeric(df):
+    
+    def is_mostly_numeric(series, seuil=0.9):
+        series_cleaned = (
+            series.astype(str)
+                .str.replace(',', '.', regex=False)  # Pour gérer les virgules décimales
+                .str.strip()                         # Nettoyer les espaces
+        )
+        converted = pd.to_numeric(series_cleaned, errors='coerce')
+        ratio = converted.notna().mean()
+        return ratio >= seuil  # Par défaut : au moins 90% de valeurs numériques
+
+    # Appliquer sur toutes les colonnes object
+    for col in df.columns:
+        if (df[col].dtype == 'object') :
+            if is_mostly_numeric(df[col]):
+                df[col] = (
+                    df[col].astype(str)
+                        .str.replace(',', '.', regex=False)
+                        .str.strip()
+                )
+                df[col] = pd.to_numeric(df[col], errors='coerce')
+
+    return df
 
 
-
-
-def generate_tableau1(df,couleur_text,couleur_background):
+def generate_tableau3(df: pd.DataFrame, couleur_text: str, couleur_background: str):
     if df is None:
         return None
-   # Calculer le résumé statistique et arrondir à 2 chiffres après la virgule
+        
+ 
     summary = df.describe().round(2)
-    # Ajouter une colonne pour expliquer chaque ligne
     summary['Description'] = {
-        'count': 'Nombre total de valeurs',
-        'mean': 'Moyenne des valeurs',
-        'std': 'Écart type des valeurs',
-        'min': 'Valeur minimale',
-        '25%': '1/4 quart',
-        '50%': '2/4 (médiane)',
-        '75%': '3/4 quartile',
-        'max': 'Valeur maximale'
+        'count': 'Nombre total de valeurs', 'mean': 'Moyenne des valeurs',
+        'std': 'Écart type des valeurs', 'min': 'Valeur minimale',
+        '25%': '1/4 quart', '50%': '2/4 (médiane)',
+        '75%': '3/4 quartile', 'max': 'Valeur maximale'
     }
-
-
-    # Réorganiser les colonnes pour que 'Description' soit la première colonne
     summary = summary[['Description'] + [col for col in summary.columns if col != 'Description']]
-    # Convertir le résumé en format dictionnaire pour Dash DataTable
     summary_dict = summary.reset_index().to_dict('records')
-    # Créer le tableau Dash avec les données du résumé
+    
     summary_table = dash_table.DataTable(
+        id='summary-table',
         data=summary_dict,
         columns=[{'name': i, 'id': i} for i in summary.columns],
         style_data_conditional=[
-            {
-                'if': {'row_index': 'odd'},
-                'backgroundColor': '#fdf2e9',
-                'color': 'black',
-
-            },
-            {
-                'if': {'row_index': 'even'},
-                'backgroundColor': '#fdf2e9',
-                'color': 'black',
-            },
+            {'if': {'row_index': 'odd'}, 'backgroundColor': couleur_background, 'color': couleur_text,},
+            {'if': {'row_index': 'even'}, 'backgroundColor': couleur_background, 'color': couleur_text,},
         ],
-        style_header={
-            'backgroundColor': '#fdf2e9',
-            'color': 'black'
-        },
-        style_table={'overflowX': 'auto'},
-        style_cell={'width': 'auto'},
+        style_header={'backgroundColor': couleur_background, 'color': couleur_text},
+        style_table={'overflowX': 'auto', 'width': '100%'},
+        style_cell={'width': 'auto', 'textAlign': 'left'},
+    )
+
+    if 'temps' in df.columns:
+        cols = ['temps', 'Date', 'Heure'] + [col for col in df.columns if col not in ['temps', 'Date', 'Heure']]
+        df = df[cols]
+
+    COL_WIDTH = '200px'
+
+    df_table = dash_table.DataTable(
+        id='raw-data-table',
+        data=df.to_dict('records'),
+        columns=[{'name': i, 'id': i} for i in df.columns],
+        
+        style_data_conditional=[
+
+            {'if': {'row_index': 'odd'}, 'backgroundColor': couleur_background, 'color': couleur_text},
+            {'if': {'row_index': 'even'}, 'backgroundColor': couleur_background, 'color': couleur_text},
+        ],
+        
+        style_header={'backgroundColor': couleur_background, 'color': couleur_text}, 
+
+        style_table={
+            'overflowX': 'auto', 
+            'overflowY': 'auto', 
+            'maxHeight': '300px', 
+            'width': '100%',    
+        }, 
+      
+        style_cell={
+            'minWidth': COL_WIDTH, 
+            'width': COL_WIDTH,
+            'maxWidth': COL_WIDTH,
+            'textAlign': 'left',
+            'whiteSpace': 'normal'
+        }, 
+        
+        fixed_rows={'headers': True},
     )
     
-    # Créer le tableau Dash avec les données du DataFrame
-    df_table = dash_table.DataTable(
-    data=df.to_dict('records'),
-    columns=[{'name': i, 'id': i} for i in df.columns],
-    style_data_conditional=[
-        {
-            'if': {'row_index': 'odd'},
-            'backgroundColor': '#fdf2e9',
-            'color': 'black',
-            'width':'100%',
-        },
-        {
-            'if': {'row_index': 'even'},
-            'backgroundColor': '#fdf2e9',
-            'color': 'black',
-            'width':'100%',
-        },
-
-    ],
-    style_header={
-        'backgroundColor': '#fdf2e9',
-        'color': 'black'
-    },   
-    style_table={'overflowX': 'auto', 'overflowY': 'auto', 'maxHeight': '300px', 'width': '100%'}, 
-    fixed_rows={'headers': True, 'data': 0},
-    style_cell={'width': 'auto', 'minWidth': '200px'},  
-)
-
-
-    # Retourner les deux tableaux dans une Div, avec une ligne de rupture entre eux
-    return html.Div([html.Br(), df_table, html.Br(),html.Br(), summary_table])
+    return html.Div([df_table, html.Br(), html.Br(), summary_table])
     
 
 #Fonctions permettant de savoir quel equation afficher

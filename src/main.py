@@ -64,10 +64,10 @@ app.layout = html.Div(style={
     'bottom': 0, 
     'left': 0, 
     'right': 0,
-    'min-height': 'auto',  # Assure que la couleur de fond s'étend sur toute la hauteur de la page
-    'min-width': 'auto', 
     'color':'black',
     'font-family': 'Arial', 
+    'min-height': '1000px',
+    'min-width': 'auto',
 },children=[
         generate_sidebar(),
         dcc.Loading(
@@ -100,23 +100,48 @@ app.layout = html.Div(style={
         
         
         ]),
+            
+            html.Table(
+        style={'width': '100%', 'borderCollapse': 'collapse','margin-left':'5%'}, # Le tableau prend 50% de la largeur de l'écran
+        
+        children=[
+            # LIGNE 1
+            html.Tr([
+                html.Td(style={'vertical-align': 'top'},children=[
+                   
+                     dcc.Dropdown(
+                            id='choix_df',
+                            options=[{'label':'Données Brutes','value':'df_brutes'}],value='df_brutes',
+                            style={'display':'block','height':'40px','width':'200px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left','margin-left':'0%'}
+                        ),
+                                        
+                ])
+        ]),
+            
+            # LIGNE 2
+            html.Tr([
+                html.Td(style={'vertical-align': 'top','margin-top':'5%'},children=[
+                    html.Div(id='page-content',style={'overflowX':'auto'}),
+                        
+                    layout_graphique,
+                    layout_fonctions,
 
-        dcc.Dropdown(
-                id='choix_df',
-                options=[{'label':'Données Brutes','value':'df_brutes'}],value='df_brutes',
-                style={'display':'block','height':'40px','width':'200px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left','margin-left':'5%'}
-            ),
-         html.Div(id='page-content'),
-         html.Br(),
-         html.Br(),
-    layout_graphique,
-    layout_fonctions,
+                    
+                ])
+            ]),
+            
+                    
+        ]
+    ),
+       
+     
 
     ], id='main-content')
 #endregion
 
 # Import callbacks after app is fully configured to avoid circular imports
 from pages.back_end_pages.back_end_graphique import *
+from pages.back_end_pages.back_end_fonctions import *
 @callback(
     Output('page-content', 'children'),
     Output('active-tab', 'data'),
@@ -132,7 +157,7 @@ def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_cli
     match ctx.triggered_id:
         case 'tab-tableau':
             
-            return generate_tableau1(newdf,'black','#f9f9f9'),'tableau'
+            return generate_tableau3(newdf,'black','#fdf2e9'),'tableau'
         case 'tab-graphique':
             return None,'graphique'
         case 'tab-maps':
