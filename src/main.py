@@ -67,7 +67,8 @@ app.layout = html.Div(style={
     'color':'black',
     'font-family': 'Arial', 
     'min-height': '1000px',
-    'min-width': 'auto',
+    'min-width': '1000px',
+    
 },children=[
         generate_sidebar(),
         dcc.Loading(
@@ -167,6 +168,68 @@ def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_cli
                 
         case _:
             return None,dash.no_update
+#region Gestion des options de DataFrame       
+@callback(
+    Output('choix_df_drp','options'),
+    Input('filtrage_df_ok','data'),
+    Input('fichier_fusion','data'),
+    Input('output_regen','data'),
+    Input('calcul_mean','data'),
+    Input('df_cop_loi_deau','data'),
+    Input('output_regen_na','data'), 
+    State('alert-displayed', 'data'),  
+    prevent_initial_call=True
+)
+def choix_df_drp(filtrage_df_ok,fichier_fusion,output_regen,calcul_mean,df_cop_loi_deau,output_regen_na,alert_displayed):
+    if options is None:
+        options = []
+    if global_df_brut is not None:
+        options.append({'label':'Données Brut','value':'DF_Brut'})
+        
+    if global_df_repared is not None: 
+        options.append({'label':'Données régénérées en ligne ','value':'df_repared'})
+
+    if global_df_mean is not None:
+        options.append({'label':'Données brut moyennées','value':'df_mean'})
+        
+    if (global_df_fusionnées is not None):
+        options.append({'label':'Données fusionnées','value':'df_fusionnées'})
+        
+    if (global_meandf_fusionnées is not None):
+        options.append({'label':'Données fusionnées moyennées','value':'meandf_fusionnées'})
+    
+    if global_df_1 is not None:
+        options.append({'label':'Données Filtrées 1','value':'df_1'})
+        
+    if global_df_2 is not None:
+        options.append({'label':'Données Filtrées 2','value':'df_2'})
+    
+    if global_df_3 is not None :
+        options.append({'label':'Données Filtrées 3','value':'df_3'})
+    
+    if global_df_4 is not None :
+        options.append({'label':'Données Filtrées 4','value':'df_4'})
+
+    if global_df_5 is not None:
+        options.append({'label':'Données Filtrées 5','value':'df_5'})
+
+    if global_meandf_1 is not None:
+        options.append({'label':'Données Filtrées 1 moyennées','value':'meandf_1'})
+        
+    if global_meandf_2 is not None:
+        options.append({'label':'Données Filtrées 2 moyennées','value':'meandf_2'})
+    
+    if global_meandf_3 is not None :
+        options.append({'label':'Données Filtrées 3 moyennées','value':'meandf_3'})
+    
+    if global_meandf_4 is not None:
+        options.append({'label':'Données Filtrées 4 moyennées','value':'meandf_4'})
+        
+    if global_meandf_5 is not None:
+        options.append({'label':'Données Filtrées 5 moyennées','value':'meandf_5'})
+          
+    return options
+#endregion
 #region RUN
 if __name__ == '__main__':
     app.run(debug=True)

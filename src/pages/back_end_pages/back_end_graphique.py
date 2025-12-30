@@ -11,6 +11,11 @@ import base64
 from utils.Fonctions import *
 from utils.data_traitment import *
 import pyarrow
+
+couleur_background='#fdf2e9'
+couleur_drpbackground='#eeeeee'
+couleur_btnbackground='#fae5d3'
+couleur_text='black'
 # Dictionnaire des fonctions
 fitting_functions = {
     'Linear': linear,
@@ -200,7 +205,6 @@ def slider(style,x,y,value,tab):
     Input('width-input', 'value'),
     Input('height-input', 'value'),
     Input('active-tab', 'data'),
-    Input('avec_condition','value'),
     Input('submit', 'n_clicks'),
     Input('choixreference','value'),
     Input('profond','value'),
@@ -238,7 +242,7 @@ def slider(style,x,y,value,tab):
     
 
 )
-def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, height, tab, condition_filtre, submit, reference, profondeur, exclure, columns, graph,  choix, x_axis, y_axis, y2_axis, point_size, point_opacity, font_size, regression,  fitting_function, relayoutData, threshold1, condition1, selected_color, condition2, condition3, threshold2, threshold3, titre_graphique, type_threshold, type_threshold2, type_threshold3, comp_colonne, condition_colonne):
+def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, height, tab,  submit, reference, profondeur, exclure, columns, graph,  choix, x_axis, y_axis, y2_axis, point_size, point_opacity, font_size, regression,  fitting_function, relayoutData, threshold1, condition1, selected_color, condition2, condition3, threshold2, threshold3, titre_graphique, type_threshold, type_threshold2, type_threshold3, comp_colonne, condition_colonne):
     if x_unit is None:
         x_unit = ''
     if y_unit is None:
@@ -490,7 +494,6 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
     Output('profond','style'),
     Output('type_graph','style',allow_duplicate=True),
     Output('file-name', 'children'),
-    Output('avec_condition','style'),
     
     Input('y-axis','value'),
     Input('active-tab', 'data'),
@@ -501,15 +504,15 @@ def filtre_graphique(y,tab):
     if (tab=='graphique'):
         if (global_df_brut is not None) :
             if y == 'prof':
-                return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+                return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
             elif y == 'filtrage':
-                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
             else:
-                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display':'inline-block'}
+                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
         
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
     else:
-        return {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, None, {'display':'none'}
+        return {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, None
 
 
 #Callback gerant le stockage des unités et la taille du graphique

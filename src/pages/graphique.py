@@ -48,10 +48,7 @@ layout_graphique=html.Table(id='table-graph',children=[
                   
                   #html.Div(id='text_df'),
                   html.Br(),
-                  html.Div([dcc.Dropdown( #Dropdown qui affichera toutes les types de données utilisable
-                      id='choix_df_drp',
-                      options=[{'label': 'Données Brut', 'value': 'DF_Brut'}],value='DF_Brut',style={'display':'none','width':'120%','vertical-align': 'top-right','margin':'auto','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px'}
-                  ),],style={'display':'flex'}),
+                  
                   
                   html.Div(id='options_graph_largeur'),
                   dcc.Input(id='width-input', type='number', value=1300,min=800,max=2000,step=10,style={'display':'none'}),#Zone de texte pour la largeur du graphique
@@ -98,15 +95,7 @@ layout_graphique=html.Table(id='table-graph',children=[
                       ],
                       value='line',inline=True,style={'display': 'none'}
                   ),
-                  dcc.RadioItems(#RadioItems gerant l'utilisation ou non du filtrage des données 
-                      id='avec_condition',
-                      options=[
-                          {'label': 'Filtrage actif', 'value': 'actif'},
-                          {'label': 'Filtrage inactif', 'value': 'desactive'},
-                          ],
-                      value='desactive',
-                      inline=True,style={'display':'none'}
-                      ),
+                 
                     html.Div(id='affichage_slider_point',children=[#Slideur pour regler la taille des points , clarté et la taille de la police lorsque le graph est en mode nuage de point
                          html.Label('Taille des points'),
                          dcc.Slider(
@@ -136,7 +125,7 @@ layout_graphique=html.Table(id='table-graph',children=[
                      ],style={'display':'none','margin':'auto','width':'100%'}),
                     html.Div(id='info_option',style={'display':'inline-block','margin-left':'3px'}),
 
-                   ],style={'display': 'inline-block','vertical-align':'top-left', 'width': '100%','margin-top':'10px','margin-left':'60px'} ),
+                   ],style={'display': 'inline-block','vertical-align':'top-left', 'width': '100%','margin-top':'10px','margin-left':'0%'} ),
 
                     html.Td([ #Deuxieme colonne du tableau pour bien repartir les elements
                         html.Table(id='table-graph_2',children=[ 
@@ -195,5 +184,5 @@ layout_graphique=html.Table(id='table-graph',children=[
                      ],style={'display':'flex'}), ],style={'display':'inline-block'}),
 ])
      
-    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'8px','display': 'inline-block'}) #1e2130
+    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'0%','display': 'inline-block'}) #1e2130
 

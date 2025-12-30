@@ -25,7 +25,78 @@ import sys
 import json
 import glob
 import pandas as pd
+import base64
+import chardet
+import csv
+import io
+#region Fonctions DataTraitement
+def detect_delimiter(decoded_str):
+    sample = decoded_str[:1024]  # Échantillon du début du fichier
+    try:
+        dialect = csv.Sniffer().sniff(sample)
+        return dialect.delimiter
+    except csv.Error:
+        print("Could not determine delimiter, using default ';'")
+        return ';'
 
+
+
+def read_csv_file(decoded, encoding, delimiter):
+    content = content = io.StringIO(decoded)
+    print("\n\n valeur de delimiter\n",delimiter)
+    print("\n\n valeur de encoding\n",encoding)
+    try :
+        df = pd.read_csv(content, sep=delimiter, thousands=' ', encoding=encoding, engine='python')
+        if df.shape[1] == 1:
+            for sep in [' ', '\t', ',']:
+                content.seek(0)
+                df = pd.read_csv(content, sep=sep, thousands=' ', encoding=encoding, engine='python')
+                if df.shape[1] > 1:
+                    break
+    except Exception as e:
+        df = pd.read_csv(content, sep=delimiter, thousands=' ', encoding=encoding, engine='python', on_bad_lines='skip')
+        if df.shape[1] == 1:
+            for sep in [' ', '\t', ',']:
+                content.seek(0)
+                df = pd.read_csv(content, sep=sep, thousands=' ', encoding=encoding, engine='python', on_bad_lines='skip')
+                if df.shape[1] > 1:
+                    break
+    return df
+
+
+def read_excel_file(decoded):
+    return pd.read_excel(io.BytesIO(decoded), engine='openpyxl')
+
+def parse_contents(contents, filename):
+    """Charge et traite un fichier CSV ou Excel."""
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    
+    if filename.endswith('.csv'):
+
+        # Détection de l'encodage
+        encoding_result = chardet.detect(decoded)
+        encoding = encoding_result['encoding']
+        print(f"Encodage détecté : {encoding}")
+
+        try:
+            decoded = decoded.decode(encoding)
+        except (UnicodeDecodeError, TypeError):
+            print("Erreur de décodage, fallback en utf-8")
+            decoded = decoded.decode("utf-8", errors="replace")
+            encoding = "utf-8"
+
+        # Détection du séparateur
+        delimiter = detect_delimiter(decoded)
+        print(f"Délimiteur détecté : {delimiter}")
+
+        df = read_csv_file(decoded, encoding, delimiter)
+    elif filename.endswith('.xlsx'):
+        df = read_excel_file(decoded)
+
+    return df
+
+#endregion
 #Fonction permettant de recrée les données manquantes temporel
 def interpolate(df,mask,pas,ordre):
     ordre=int(ordre)
@@ -159,13 +230,10 @@ def generate_tableau3(df: pd.DataFrame, couleur_text: str, couleur_background: s
             {'if': {'row_index': 'even'}, 'backgroundColor': couleur_background, 'color': couleur_text,},
         ],
         style_header={'backgroundColor': couleur_background, 'color': couleur_text},
-        style_table={'overflowX': 'auto', 'width': '100%'},
+        style_table={'overflowX': 'auto', 'width': '30%'},
         style_cell={'width': 'auto', 'textAlign': 'left'},
     )
 
-    if 'temps' in df.columns:
-        cols = ['temps', 'Date', 'Heure'] + [col for col in df.columns if col not in ['temps', 'Date', 'Heure']]
-        df = df[cols]
 
     COL_WIDTH = '200px'
 
@@ -173,7 +241,7 @@ def generate_tableau3(df: pd.DataFrame, couleur_text: str, couleur_background: s
         id='raw-data-table',
         data=df.to_dict('records'),
         columns=[{'name': i, 'id': i} for i in df.columns],
-        
+        virtualization=True,
         style_data_conditional=[
 
             {'if': {'row_index': 'odd'}, 'backgroundColor': couleur_background, 'color': couleur_text},
@@ -182,11 +250,12 @@ def generate_tableau3(df: pd.DataFrame, couleur_text: str, couleur_background: s
         
         style_header={'backgroundColor': couleur_background, 'color': couleur_text}, 
 
-        style_table={
-            'overflowX': 'auto', 
+       style_table={
+            'overflowX': 'auto', # Active la barre horizontale si le contenu dépasse
             'overflowY': 'auto', 
             'maxHeight': '300px', 
-            'width': '100%',    
+            'width': '30%',      # Oblige le tableau à rester dans les limites de son parent
+            'minWidth': '20%',
         }, 
       
         style_cell={
@@ -354,17 +423,14 @@ def load_data(filename):
     with open(filename + '_settings.json', 'r') as f:
         return json.load(f)
 
-def affectation_df(choix,df,global_df_brut,global_df_repared,global_df_loisdeau,global_df_decal,global_df_filtrees,global_df_mean,global_meandf_filtrees,global_repared_na,global_meandf_decal,global_meandf_repared,global_meandf_repared_na,global_df_fusionnées,global_meandf_fusionnées,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5):
+def affectation_df(choix,df,global_df_brut,global_df_mean,global_df_fusionnées,global_meandf_fusionnées,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5):
     if choix == 'DF_Brut':
         global_df_brut=df
     elif choix == 'df_fusionnées' and df is not None:
         global_df_fusionnées=df
     elif choix == 'df_mean' and df is not None:
         global_df_mean=df
-    elif choix == 'meandf_filtrees':
-        global_meandf_filtrees=df
-    elif choix == 'df_filtrees':
-        global_df_filtrees=df
+   
     elif choix == 'df_1':
         global_df_1=df
     elif choix == 'df_2':

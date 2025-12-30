@@ -1,13 +1,9 @@
-from dash import Input, Output, State, callback, ctx
-import dash
-from dash import dcc, html, no_update
-import numpy as np
-import pandas as pd
+from pages.back_end_pages.back_end_graphique import *
 import dash_daq as daq
 from utils.Fonctions import *
 
-layout_fonctions = html.Div([
-            html.Table(id='table-options',children=[ #Tableau visible dans l'onglet Options
+ #html.Div([
+layout_fonctions = html.Table(id='table-options',children=[ #Tableau visible dans l'onglet Options
                 html.Tr([ 
                     html.Td([
                         html.Th('Fonction', style={'width': '30%','text-align':'center','font-size':'17px','vertical-align':'center'}),#Titre de la 1er colonne 
@@ -26,21 +22,19 @@ layout_fonctions = html.Div([
                            options = [
                                
                                 {'label':'Filtrage des données', 'value':'filtrage_df_données'},
-                                {'label':'Sélection de l année', 'value':'selec_annee'},
                                 {'label': 'Renommer colonne', 'value': 'rename'},
                                 {'label': 'Solveur', 'value': 'solveur'},
                                 {'label': 'Scission', 'value': 'scission'},
                                 {'label': 'Calcul de pente/variation', 'value': 'calcul_pente'},
                                 {'label': 'Calcul de moyenne', 'value': 'moyenne'},
                                 {'label': 'Profondeur', 'value': 'prof'},
-                                
-                                {'label': 'Fonctions utilisateurs', 'value': 'fcnt_extern'},
+                                {'label': 'Fusionner des fichiers', 'value': 'fusion_fichier'},
                                 
 
                             ],
                             placeholder="Paramètres et fonctions",#Quand le dropdown est vide ce message s'affiche dedans
                             style={'display': 'none','vertical-align':'top','maring-left':'5px'}
-                        ),],style={'width':'40%','heigh':'20px','border': '1px solid #1e2130','padding-left': '8px','padding-top': '2px'}),
+                        ),],style={'width':'20%','heigh':'20px','border': '1px solid #1e2130','padding-left': '8px','padding-top': '2px'}),
                     html.Td([
                         dcc.Dropdown(id='drp_pente', placeholder='Sélectionnez une colonne', style={'display':'none'}),
                         dcc.Dropdown(id='function-file-dropdown', placeholder='Sélectionnez un fichier chargé', style={'display':'none'}),
@@ -91,8 +85,22 @@ layout_fonctions = html.Div([
                              ]),
                     
 
-                    ],style={'width':'30%','heigh':'20px','border': '1px solid #1e2130', 'padding-left': '8px'}),
+                    ],style={'width':'20%','heigh':'20px','border': '1px solid #1e2130', 'padding-left': '8px'}),
                     html.Td([
+                        dcc.Upload( #Fonction permettant de charger un fichier 
+                            id='upload-second-data',
+                            children=html.Button(
+                                'Fichier', #le texte que contiendras ce boutton
+                                style={
+                                    'backgroundColor':'#eeeeee', # Couleur de fond du bouton
+                                    'color': 'black', # Couleur du texte du bouton
+                                    'border': '2px solid #4b5160', # Supprime la bordure par défaut du bouton
+                                    'height': '30px', 'width': '80px', 'borderRadius': '5px',
+                                }
+                            ),
+                           style= { 'display': 'none', 'vertical-align': 'top', 'text-align': 'center','borderRadius': '5px'},
+                          multiple=False
+                        ),
                            html.Button('Ouvrir le code par défaut', id='vs_code_fcnt',style={'display':'none'}),
 
                          dcc.Input(#zone de texte permettant de rentrer la valeur de seuille pour notre filtrage de donnée
@@ -126,7 +134,14 @@ layout_fonctions = html.Div([
                     html.Div(id='ok_pente'),
                     html.Div(id='texte_regression'),
                     html.Button('Calculer', id='btn_pente', n_clicks=0),
-                                               
+                    dcc.RadioItems(#RadioItems permets d'avoir des bouttons a choix, qui ceux unique on doit faire 1 choix sur les differentes proposition
+                     id='type_fusion',#Identifiant de ce dcc.RadioItems
+                     options=[#Options correspond aux choix qu'on pourras faire avec ce RadioItems, meme principe que pour les dropdown
+                         {'label': 'Fusion de lignes', 'value': 'f_lignes'},
+                         {'label': 'Fusion de colonnes', 'value': 'f_colonnes'},
+                     ], 
+                     value='f_lignes',inline=True, style={'width':'100%','display': 'none'}#l'options inline permets d'avoir les bouttons de choix a la suite 
+                 ),
                         
                         html.Div(id='saut16'),
                                                
@@ -196,9 +211,9 @@ layout_fonctions = html.Div([
                         dcc.RadioItems(#Permet de choisir quel type de moyenne utilisé
                             id='type_mean',
                             options=[
-                                {'label': 'Moyenne glissante', 'value': 'mean_g'},{'label': 'Moyenne cumulée', 'value': 'mean_cum'},{'label': 'Moyenne horaire', 'value': 'mean_horaire'}
+                                {'label': 'Moyenne cumulée', 'value': 'mean_cum'},{'label': 'Moyenne par critère', 'value': 'mean_critere'}
                             ],
-                            value='mean_g',inline=True,
+                            value='mean_cum',inline=True,
                             style={'display': 'none'}
                         ),
                         html.Div(id='saut8'),
@@ -222,7 +237,20 @@ layout_fonctions = html.Div([
                             value='filtrage_off',inline=True,
                             style={'display': 'none'}
                         ),
-                        
+                        dcc.Upload( #Fonction permettant de charger un fichier 
+                            id='fichier_fusionner',
+                            children=html.Button(
+                                'Fichier', #le texte que contiendras ce boutton
+                                style={
+                                    'backgroundColor':couleur_btnbackground, # Couleur de fond du bouton
+                                    'color': couleur_text, # Couleur du texte du bouton
+                                    'border': '2px solid #4b5160', # Supprime la bordure par défaut du bouton
+                                    'height': '30px', 'width': '80px', 'borderRadius': '5px',
+                                }
+                            ),
+                           style= { 'display': 'none', 'vertical-align': 'top', 'text-align': 'center','borderRadius': '5px'},
+                          multiple=True
+                        ),
                         
                         
                         html.Button('Valider les puissances', id='valider', style={ 'display': 'none'}),
@@ -271,9 +299,11 @@ layout_fonctions = html.Div([
                             html.Button('Valider le filtrage', id='submit', n_clicks=0,style={'display':'none'}),#boutton pour valider notre saisie sur la valeur de seuil
 
                         ],style={'display':'none','marginBottom':'5px'}),
-                        ],style={'heigh':'20px','border': '1px solid #1e2130','width':'40%', 'padding-left': '8px'}),
+                        ],style={'heigh':'20px','border': '1px solid #1e2130','width':'20%', 'padding-left': '8px'}),
                 
-                ],style={'padding-top': '0px'},),
+                ],style={'padding-top': '0px','margin-top':'0px'}),
                
-            ], style={'border': '10px solid #fae5d3','width':'140%','display':'none','margin-left':'8px'}),
-        ], style={'display': 'block','width':'140%','margin-left':'50px'})
+            ], style={'border': '10px solid #fae5d3','width':'50%','display':'none','margin-left':'0px','position': 'absolute','top': '50px','zIndex': '100'})
+
+
+        #], style={'display': 'block','width':'100%','margin-left':'0%','margin-top':'0%'})
