@@ -318,13 +318,9 @@ def choix_equation(fitting_function, *popt):
         return "y = {:.2e} * sinc^2({:.2e} * (x - {}) / π) * cos^2({:.2e} * (x - {:.2e})) + {:.2e}".format(popt[0], popt[1], formatted_val_x0, popt[2], val_x0, popt[4])
 
 def initialiser_variables_globales():
-    global global_df_brut
-    global global_df_repared 
+   
     global global_df_mean  
-    global global_repared_na  
-    global global_meandf_decal  
-    global global_meandf_repared  
-    global global_meandf_repared_na 
+
     global global_df_fusionnées 
     global global_meandf_fusionnées
     global global_df_1 
@@ -494,15 +490,14 @@ def interpolate(df,mask,pas,ordre):
     return df
 
 #Fonction permettant de choisir quel data frame utiliser
-def choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5):
+def choix_df(choix,global_df_brut,global_df_mean,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5):
     
     if choix == 'df_brutes':
         df = global_df_brut
         
     elif choix == 'df_mean':
         df = global_df_mean
-    elif choix == 'meandf_repared':
-        df = global_meandf_repared
+
     elif choix == 'df_fusionnées':
         df = global_df_fusionnées
     elif choix == 'meandf_fusionnées':

@@ -98,6 +98,7 @@ app.layout = html.Div(style={
         dcc.Store(id='fichier_fusion'),
         
         dcc.Store(id='filtrage_df_ok'),
+        dcc.Download(id='download_df'),
         
         
         ]),
@@ -113,7 +114,7 @@ app.layout = html.Div(style={
                      dcc.Dropdown(
                             id='choix_df',
                             options=[{'label':'Données Brutes','value':'df_brutes'}],value='df_brutes',
-                            style={'display':'block','height':'40px','width':'200px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left','margin-left':'0%'}
+                            style={'display':'block','height':'40px','width':'300px','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','textAlign': 'left','margin-left':'0%'}
                         ),
                                         
                 ])
@@ -149,87 +150,99 @@ from pages.back_end_pages.back_end_fonctions import *
     Input('tab-tableau','n_clicks'),
     Input('tab-graphique','n_clicks'),
     Input('tab-maps','n_clicks'),
+    Input('tab-exporter','n_clicks'),
     Input('tab-fonctions','n_clicks'),
     Input('tab-informations','n_clicks'),
-    State('choix_df','value'),
+    Input('choix_df','value'),
 )
-def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_click,informations_click,choix):
-    newdf=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_click,exporter_clicks,informations_click,choix):
+    df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
     match ctx.triggered_id:
         case 'tab-tableau':
-            
-            return generate_tableau3(newdf,'black','#fdf2e9'),'tableau'
+            return generate_tableau3(df,'black','#fdf2e9'),'tableau'
         case 'tab-graphique':
             return None,'graphique'
         case 'tab-maps':
             return None,'maps'
         case 'tab-fonctions':
             return None,'options'
+        case 'tab-exporter':
+            return None,'exporter'
+        case 'tab-informations':
+            return None,'informations'
+
                 
         case _:
             return None,dash.no_update
 #region Gestion des options de DataFrame       
 @callback(
-    Output('choix_df_drp','options'),
+    Output('choix_df','options'),
     Input('filtrage_df_ok','data'),
     Input('fichier_fusion','data'),
     Input('output_regen','data'),
     Input('calcul_mean','data'),
-    Input('df_cop_loi_deau','data'),
-    Input('output_regen_na','data'), 
     State('alert-displayed', 'data'),  
-    prevent_initial_call=True
+    #prevent_initial_call=True
 )
-def choix_df_drp(filtrage_df_ok,fichier_fusion,output_regen,calcul_mean,df_cop_loi_deau,output_regen_na,alert_displayed):
-    if options is None:
-        options = []
-    if global_df_brut is not None:
-        options.append({'label':'Données Brut','value':'DF_Brut'})
-        
-    if global_df_repared is not None: 
-        options.append({'label':'Données régénérées en ligne ','value':'df_repared'})
+def choix_df_drp(filtrage_df_ok,fichier_fusion,output_regen,calcul_mean,alert_displayed):
 
-    if global_df_mean is not None:
-        options.append({'label':'Données brut moyennées','value':'df_mean'})
+    options = []
+    if dt.global_df_brut is not None:
+        options.append({'label':'Données Brutes','value':'df_brutes'})
         
-    if (global_df_fusionnées is not None):
+    if dt.global_df_mean is not None:
+        options.append({'label':'Données Brutes moyennées','value':'df_mean'})
+        
+    if (dt.global_df_fusionnées is not None):
         options.append({'label':'Données fusionnées','value':'df_fusionnées'})
         
-    if (global_meandf_fusionnées is not None):
+    if (dt.global_meandf_fusionnées is not None):
         options.append({'label':'Données fusionnées moyennées','value':'meandf_fusionnées'})
     
-    if global_df_1 is not None:
+    if dt.global_df_1 is not None:
         options.append({'label':'Données Filtrées 1','value':'df_1'})
         
-    if global_df_2 is not None:
+    if dt.global_df_2 is not None:
         options.append({'label':'Données Filtrées 2','value':'df_2'})
     
-    if global_df_3 is not None :
+    if dt.global_df_3 is not None :
         options.append({'label':'Données Filtrées 3','value':'df_3'})
     
-    if global_df_4 is not None :
+    if dt.global_df_4 is not None :
         options.append({'label':'Données Filtrées 4','value':'df_4'})
 
-    if global_df_5 is not None:
+    if dt.global_df_5 is not None:
         options.append({'label':'Données Filtrées 5','value':'df_5'})
 
-    if global_meandf_1 is not None:
+    if dt.global_meandf_1 is not None:
         options.append({'label':'Données Filtrées 1 moyennées','value':'meandf_1'})
         
-    if global_meandf_2 is not None:
+    if dt.global_meandf_2 is not None:
         options.append({'label':'Données Filtrées 2 moyennées','value':'meandf_2'})
     
-    if global_meandf_3 is not None :
+    if dt.global_meandf_3 is not None :
         options.append({'label':'Données Filtrées 3 moyennées','value':'meandf_3'})
     
-    if global_meandf_4 is not None:
+    if dt.global_meandf_4 is not None:
         options.append({'label':'Données Filtrées 4 moyennées','value':'meandf_4'})
         
-    if global_meandf_5 is not None:
+    if dt.global_meandf_5 is not None:
         options.append({'label':'Données Filtrées 5 moyennées','value':'meandf_5'})
           
     return options
 #endregion
+@callback(
+    Output('download_df', 'data'),
+    Input('active-tab', 'data'),
+    State('choix_df','value')
+)
+def exportation_df(tab,choix):
+    if tab=='exporter':
+        print("\n\n\n\n\n\n Je suis dans le truc pour exporter \n\n")
+        df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
+        return dcc.send_data_frame(df.to_csv, "traité_raw_data.csv", sep=';', index=False)
+    else:
+        return dash.no_update
 #region RUN
 if __name__ == '__main__':
     app.run(debug=True)

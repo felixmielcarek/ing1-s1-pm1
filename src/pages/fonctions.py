@@ -206,8 +206,6 @@ layout_fonctions = html.Table(id='table-options',children=[ #Tableau visible dan
                             inline=True,style={'display':'none'}#Le style={'display':'none'} permet de ne pas afficher de base ce RadioItems pour l'afficher qu'a une certaine condition par exemple ici il s'afficheras que quand on selectionneras filtrage dans le menu 'filtre' et pour l'afficher on change le display:none en display: block ou inline-block
                             ),
                         
-                        
-                        
                         dcc.RadioItems(#Permet de choisir quel type de moyenne utilisé
                             id='type_mean',
                             options=[

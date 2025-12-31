@@ -184,5 +184,5 @@ layout_graphique=html.Table(id='table-graph',children=[
                      ],style={'display':'flex'}), ],style={'display':'inline-block'}),
 ])
      
-    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'0%','display': 'inline-block'}) #1e2130
+    ], style={'display': 'flex'}),]),]),], style={'width':'40%','margin-left':'0%','display': 'inline-block','margin-left':'0px','position': 'absolute','top': '50px','zIndex': '100'}) #1e2130
 

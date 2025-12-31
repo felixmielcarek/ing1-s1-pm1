@@ -9,7 +9,7 @@ from scipy.optimize import curve_fit
 from scipy.special import factorial
 import base64
 from utils.Fonctions import *
-from utils.data_traitment import *
+import utils.data_traitment as dt
 import pyarrow
 
 couleur_background='#fdf2e9'
@@ -79,8 +79,7 @@ def taille_auto_axes(val_y, valy2):
      )
 def value_axe(tab,choix,y_value,y2_value,x_axis):
     if tab=='graphique':
-
-        df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+        df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
 
         if len(df.columns)<4:
             #print('\n\n\n\n\n CEST PLUS PETIT')
@@ -123,9 +122,9 @@ def choix_des_axes(tab,choix):
         return dash.no_update,{'display': 'none'}, dash.no_update,{'display': 'none'}, dash.no_update,{'display': 'none'},None,None,None,{'display':'none'},{'display':'none'},{'display':'none'},{'display': 'none'}#,{'display': 'none'},{'display': 'none'}
     else :
         print(" \n\n\n\n\n Je suis dans graphique !!!! \n\n")
-        if global_df_brut is not None:
+        if dt.global_df_brut is not None:
             
-            df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+            df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
             
             style_button={ 'display': 'inline-block', 'vertical-align': 'right', 'text-align': 'center','margin-left':'3%', 'borderRadius': '5px','backgroundColor':'#eeeeee', 'color': 'black','border': '2px solid #4b5160'}
 
@@ -170,7 +169,7 @@ def choix_des_axes(tab,choix):
  )
 
 def slider(style,x,y,value,tab):
-    if tab=='graphique' and global_df_brut is not None:
+    if (tab=='graphique') and (dt.global_df_brut is not None):
         opt_l=[
         html.Br(),
         html.Label('Largeur :'), ]
@@ -184,7 +183,7 @@ def slider(style,x,y,value,tab):
         else:
             axe= {'display':'none'} #Dans ce if les slider s'afficheront car nuage de point a ete selectionner
         return graph_style,opt_l,opt_h,"Unité : ","Unité : ","Unité : ",{'display':'inline-block','margin-left':'5px'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},{'display':'inline-block'},axe,{'display':'inline-block'},text_graph,{'display':'block','width':'80%','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px'},
-    if tab!='graphique' or ((x and y is None) or global_df_brut is None):
+    if tab!='graphique' or ((x and y is None) or dt.global_df_brut is None):
         graph_style={'display':'none'}
     
     return graph_style,None,None,None,None,None,{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},{'display':'none'},None,{'display':'none'}
@@ -253,7 +252,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
     if tab != 'graphique':
         return no_update, no_update
     
-    filtered_df = choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+    filtered_df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
 
     #filtered_df = global_df_brut
     fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -453,7 +452,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
 #endregion
 
 @callback(
-    Output('y-axis', 'value', allow_duplicate=True),
+    Output('y-axis', 'value'),
     Input('all_selec', 'n_clicks'),
     Input('y-axis', 'value'),
     Input('x-axis', 'value'),
@@ -473,7 +472,7 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
     
     if button_id == 'all_selec':
 
-        df=choix_df(choix,global_df_brut,global_df_mean,global_meandf_repared,global_df_fusionnées,global_meandf_fusionnées,global_df_1,global_df_2,global_df_3,global_df_4,global_df_5,global_meandf_1,global_meandf_2,global_meandf_3,global_meandf_4,global_meandf_5)
+        df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
         if x_axis is not None:
             # Récupère toutes les valeurs des colonnes
             all_values = df.columns.tolist()
@@ -492,7 +491,7 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
 @callback(
     Output('Regression','style'),
     Output('profond','style'),
-    Output('type_graph','style',allow_duplicate=True),
+    Output('type_graph','style'),
     Output('file-name', 'children'),
     
     Input('y-axis','value'),
@@ -502,7 +501,9 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
 )
 def filtre_graphique(y,tab):
     if (tab=='graphique'):
-        if (global_df_brut is not None) :
+        print("\n\n\n\n Je suis dans le graphique \n\n")
+        if (dt.global_df_brut is not None) :
+
             if y == 'prof':
                 return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
             elif y == 'filtrage':
