@@ -24,13 +24,13 @@ import sys
 
 import glob
 import pandas as pd
-
+import webbrowser
+from threading import Timer
 #endregion
 
 #region FUNC IMPORTS
 from components.sidebar import *
 from utils.Fonctions import *
-from pages.tableau import *
 from pages.graphique import layout_graphique
 from pages.fonctions import layout_fonctions
 # Moved to end to avoid circular import: from pages.back_end_pages.back_end_graphique import *
@@ -154,26 +154,28 @@ from pages.back_end_pages.back_end_fonctions import *
     Input('tab-fonctions','n_clicks'),
     Input('tab-informations','n_clicks'),
     Input('choix_df','value'),
+    State('active-tab', 'data')
 )
-def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_click,exporter_clicks,informations_click,choix):
+def generate_page_content(tableau_click,graphique_click,maps_click,fonctions_click,exporter_clicks,informations_click,choix,active_tab):
     df=choix_df(choix,dt.global_df_brut,dt.global_df_mean,dt.global_df_fusionnées,dt.global_meandf_fusionnées,dt.global_df_1,dt.global_df_2,dt.global_df_3,dt.global_df_4,dt.global_df_5,dt.global_meandf_1,dt.global_meandf_2,dt.global_meandf_3,dt.global_meandf_4,dt.global_meandf_5)
-    match ctx.triggered_id:
-        case 'tab-tableau':
-            return generate_tableau3(df,'black','#fdf2e9'),'tableau'
-        case 'tab-graphique':
+    trigger = ctx.triggered_id
+    target_tab = trigger.replace('tab-', '') if trigger and trigger.startswith('tab-') else active_tab
+    match target_tab:
+        case 'tableau':
+            print("\n\n ICI IIIII\n\n\n")
+            return generate_tableau3(df, 'black', '#fdf2e9'), 'tableau'
+        case 'graphique':
             return None,'graphique'
-        case 'tab-maps':
+        case 'maps':
             return None,'maps'
-        case 'tab-fonctions':
+        case 'fonctions':
             return None,'options'
-        case 'tab-exporter':
-            return None,'exporter'
-        case 'tab-informations':
-            return None,'informations'
-
-                
+        case 'exporter':
+            return dash.no_update,'exporter'
+        case 'informations':
+            return dash.no_update,'informations' 
         case _:
-            return None,dash.no_update
+            return dash.no_update,dash.no_update
 #region Gestion des options de DataFrame       
 @callback(
     Output('choix_df','options'),
@@ -243,8 +245,12 @@ def exportation_df(tab,choix):
         return dcc.send_data_frame(df.to_csv, "traité_raw_data.csv", sep=';', index=False)
     else:
         return dash.no_update
+def open_browser():
+    # On définit l'adresse par défaut de Dash
+    webbrowser.open_new("http://127.0.0.1:8050/")
 #region RUN
 if __name__ == '__main__':
-    app.run(debug=True)
+    Timer(1, open_browser).start()
+    app.run(debug=True, use_reloader=True)
 #endregion
 

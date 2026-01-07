@@ -29,6 +29,7 @@ import base64
 import chardet
 import csv
 import io
+from pandas.api.types import is_numeric_dtype
 #region Fonctions DataTraitement
 def detect_delimiter(decoded_str):
     sample = decoded_str[:1024]  # Échantillon du début du fichier
@@ -121,17 +122,51 @@ def apply_filters(df, col, conditions, thresholds, condition_colonne, comp_colon
     filtered_df = df.copy()
     
     if col is not None and conditions is not None and thresholds is not None:
-        for col_name, condition, threshold in zip(col, conditions, thresholds):
-            if col_name is not None and condition is not None and threshold is not None:
-                if isinstance(threshold, str) and threshold.replace('.', '', 1).isdigit():
-                    threshold = float(threshold)
                 
-                if condition == 'gt':
-                    filtered_df = filtered_df[filtered_df[col_name] > threshold]
-                elif condition == 'eq':
-                    filtered_df = filtered_df[filtered_df[col_name] == threshold]
-                elif condition == 'lt':
-                    filtered_df = filtered_df[filtered_df[col_name] < threshold]
+                # On boucle sur les triplets (colonne, condition, seuil)
+                for col_name, condition, threshold in zip(col, conditions, thresholds):
+                    
+                    # On ignore si une des valeurs est manquante
+                    if col_name is not None and condition is not None and threshold is not None:
+                        
+                        # --- 1. Gestion Intelligente du Type (Texte vs Nombre) ---
+                        # On vérifie si la colonne du DF est numérique
+                        is_numeric = is_numeric_dtype(filtered_df[col_name])
+                        actual_threshold = threshold
+
+                        # Si la colonne est numérique et le seuil est du texte, on convertit
+                        if is_numeric and isinstance(threshold, str):
+                            # Petite sécurité pour éviter les erreurs de conversion
+                            if threshold.replace('.', '', 1).isdigit():
+                                actual_threshold = float(threshold)
+                        
+                        # DEBUG
+                        print(f"DEBUG: Colonne='{col_name}', TypeNumerique={is_numeric}")
+                        print(f"DEBUG: Condition='{condition}', Seuil='{actual_threshold}'")
+
+                        # --- 2. Application du Filtrage ---
+                        try:
+                            if condition == 'gt': # Greater than
+                                if is_numeric:
+                                    filtered_df = filtered_df[filtered_df[col_name] > actual_threshold]
+                                
+                            elif condition == 'lt': # Less than
+                                if is_numeric:
+                                    filtered_df = filtered_df[filtered_df[col_name] < actual_threshold]
+                                
+                            elif condition == 'eq': # Equal
+                                if not is_numeric:
+                                    # Cas TEXTE : on compare sans se soucier de la casse/espaces
+                                    filtered_df = filtered_df[
+                                        filtered_df[col_name].astype(str).str.strip().str.lower() == str(actual_threshold).strip().lower()
+                                    ]
+                                else:
+                                    # Cas NUMÉRIQUE
+                                    filtered_df = filtered_df[filtered_df[col_name] == actual_threshold]
+
+                        except Exception as e:
+                            print(f"ERREUR lors du filtrage sur {col_name} : {e}")
+
     
     if condition_colonne is not None and comp_colonne is not None and len(comp_colonne) == 2:
         if condition_colonne == 'gt':
@@ -209,67 +244,60 @@ def convert_to_numeric(df):
 def generate_tableau3(df: pd.DataFrame, couleur_text: str, couleur_background: str):
     if df is None:
         return None
-        
- 
-    summary = df.describe().round(2)
-    summary['Description'] = {
-        'count': 'Nombre total de valeurs', 'mean': 'Moyenne des valeurs',
-        'std': 'Écart type des valeurs', 'min': 'Valeur minimale',
-        '25%': '1/4 quart', '50%': '2/4 (médiane)',
-        '75%': '3/4 quartile', 'max': 'Valeur maximale'
+
+    # 1. Calcul des statistiques sur TOUTES les colonnes
+    summary = df.describe(include='all').fillna('-').round(2)
+    
+    descriptions = {
+        'count': 'Nombre total', 'unique': 'Valeurs uniques',
+        'top': 'Plus fréquent', 'freq': 'Fréquence top',
+        'mean': 'Moyenne', 'std': 'Écart type', 
+        'min': 'Min', '25%': '1/4 q', '50%': 'Médiane',
+        '75%': '3/4 q', 'max': 'Max'
     }
+    
+    summary['Description'] = [descriptions.get(i, i) for i in summary.index]
     summary = summary[['Description'] + [col for col in summary.columns if col != 'Description']]
     summary_dict = summary.reset_index().to_dict('records')
-    
+
+    # Tableau Sommaire
     summary_table = dash_table.DataTable(
         id='summary-table',
         data=summary_dict,
         columns=[{'name': i, 'id': i} for i in summary.columns],
-        style_data_conditional=[
-            {'if': {'row_index': 'odd'}, 'backgroundColor': couleur_background, 'color': couleur_text,},
-            {'if': {'row_index': 'even'}, 'backgroundColor': couleur_background, 'color': couleur_text,},
-        ],
-        style_header={'backgroundColor': couleur_background, 'color': couleur_text},
-        style_table={'overflowX': 'auto', 'width': '30%'},
-        style_cell={'width': 'auto', 'textAlign': 'left'},
+        style_header={'backgroundColor': couleur_background, 'color': couleur_text, 'fontWeight': 'bold'},
+        style_data={'backgroundColor': couleur_background, 'color': couleur_text},
+        style_table={'overflowX': 'auto', 'width': '100%'}, # Élargi pour voir les colonnes textuelles
+        style_cell={'textAlign': 'left', 'padding': '5px'},
     )
 
-
-    COL_WIDTH = '200px'
-
+    # Tableau de données brutes
     df_table = dash_table.DataTable(
         id='raw-data-table',
         data=df.to_dict('records'),
         columns=[{'name': i, 'id': i} for i in df.columns],
-        virtualization=True,
-        style_data_conditional=[
-
-            {'if': {'row_index': 'odd'}, 'backgroundColor': couleur_background, 'color': couleur_text},
-            {'if': {'row_index': 'even'}, 'backgroundColor': couleur_background, 'color': couleur_text},
-        ],
         
-        style_header={'backgroundColor': couleur_background, 'color': couleur_text}, 
-
-       style_table={
-            'overflowX': 'auto', # Active la barre horizontale si le contenu dépasse
-            'overflowY': 'auto', 
-            'maxHeight': '300px', 
-            'width': '30%',      # Oblige le tableau à rester dans les limites de son parent
-            'minWidth': '20%',
-        }, 
-      
-        style_cell={
-            'minWidth': COL_WIDTH, 
-            'width': COL_WIDTH,
-            'maxWidth': COL_WIDTH,
-            'textAlign': 'left',
-            'whiteSpace': 'normal'
-        }, 
+        # FIX: Gestion de l'affichage de toutes les lignes
+        page_action='native', 
+        #page_size=auto, # Permet de naviguer par blocs de 20 pour la fluidité
         
         fixed_rows={'headers': True},
+        style_header={'backgroundColor': couleur_background, 'color': couleur_text, 'fontWeight': 'bold'},
+        style_data={'backgroundColor': couleur_background, 'color': couleur_text},
+        style_table={
+            'overflowX': 'auto',
+            'overflowY': 'auto',
+            'maxHeight': '500px', # Fixe une hauteur pour le scroll vertical
+            'width': '100%',
+        },
+        style_cell={
+            'minWidth': '150px', 'width': '150px', 'maxWidth': '150px',
+            'textAlign': 'left',
+            'whiteSpace': 'normal'
+        },
     )
     
-    return html.Div([df_table, html.Br(), html.Br(), summary_table])
+    return html.Div([ html.Br(),df_table, html.Br(), summary_table],style={'width':'30%'})
     
 
 #Fonctions permettant de savoir quel equation afficher

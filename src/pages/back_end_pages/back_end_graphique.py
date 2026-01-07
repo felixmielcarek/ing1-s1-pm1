@@ -259,6 +259,7 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
     #filtered_df=filtered_df.compute()  
     if graph == 'dot':
         if profondeur == 'Prof_avec':
+            print("\n\n\n\n\n dans le if profondeur == Prof Avec \n\n\n")
             color_palette = [color['hex'] for color in selected_color]
             category_codes = filtered_df[reference].astype('category').cat.codes
             category_labels = filtered_df[reference].astype('category').cat.categories
@@ -291,9 +292,11 @@ def update_graph(log_x,log_y,log_y2,type_bar, x_unit, y_unit, y2_unit, width, he
                         colorscale=type_col,
                         opacity=point_opacity,
                         colorbar=dict(
-                            title=reference,
-                            titleside='right',
-                            titlefont=dict(size=14, family='Arial, sans-serif'),
+                            title={
+                                'text': reference,
+                                'side': 'right',
+                                'font': dict(size=14, family='Arial, sans-serif')
+                            },
                             x=1.05,
                             xanchor='left',
                             y=0.7,
@@ -493,27 +496,27 @@ def select_all_options(n_clicks, y_axis, x_axis, choix):
     Output('profond','style'),
     Output('type_graph','style'),
     Output('file-name', 'children'),
-    
+    Output('type_bar','style'),
     Input('y-axis','value'),
     Input('active-tab', 'data'),
-    
+    Input('submit-color','n_clicks'),
+    Input('selected_color','data'),
+
     prevent_initial_call=True
 )
-def filtre_graphique(y,tab):
+def filtre_graphique(y,tab,btn_profond,data_color):
     if (tab=='graphique'):
-        print("\n\n\n\n Je suis dans le graphique \n\n")
+
         if (dt.global_df_brut is not None) :
 
-            if y == 'prof':
-                return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
-            elif y == 'filtrage':
-                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
+            if (btn_profond and data_color) is not None:
+                return {'display': 'block'}, {'display': 'block'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display': 'block'}
             else:
-                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata"
+                return {'display': 'block'}, {'display': 'none'}, {'display': 'inline-block','margin':'top-right','margin-right':'10px'}, f"Nom du fichier : rawdata", {'display': 'none'}
         
-        return dash.no_update, dash.no_update, dash.no_update, dash.no_update
+        return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
     else:
-        return {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, None
+        return {'display': 'none'}, {'display': 'none'}, {'display': 'none'}, None, {'display': 'none'}
 
 
 #Callback gerant le stockage des unités et la taille du graphique

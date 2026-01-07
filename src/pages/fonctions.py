@@ -60,14 +60,10 @@ layout_fonctions = html.Table(id='table-options',children=[ #Tableau visible dan
                     
                     html.Div(id='saut_fcnt_filtrees_drp'),
                     #Filtrage de données
-                    html.Div(id='info_filtre_1'),
                     html.Div(id='info_filtre_2'),
                 dcc.Dropdown(id='columns',multi=True,style={'display':'none'}),#Selectionner quel colonne on veut exclure de notre data frame
-                html.Div(id='info_filtre_4'),
                 dcc.Dropdown(id='date-picker2', multi=True, style={'width':'100%','display': 'none'}), #Choix de ou des jours 
                 
-                html.Div(id='info_filtre_3'),
-
                 dcc.Dropdown(id='filtrage_temp_heure_debut', placeholder='Entrez le debut du filtrage horaire', style={'overflowY':'visible','vertical-align':'right','display': 'none','backgroundColor': '#eeeeee', 'color': 'black','border':'none','borderRadius': '10px','width':'90%'}),
                 html.Div(id='saut_filtre_1'),
 
