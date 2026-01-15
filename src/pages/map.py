@@ -11,6 +11,62 @@ layout_map = html.Div(id='table-map', style={'display': 'none'}, children=[
             'marginTop': '20px'
         }),
         
+        # Filtres de critères
+        html.Div([
+            html.H4("Filtres", style={'textAlign': 'center', 'marginBottom': '15px'}),
+            html.Div([
+                html.Div([
+                    html.Label("Carburant:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-carburant',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Crit'Air:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-critair',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Statut:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-statut',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Groupe:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-groupe',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Catégorie:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-categorie',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'verticalAlign': 'top'}),
+            ], style={'textAlign': 'center', 'marginBottom': '20px'})
+        ], style={'marginBottom': '25px', 'padding': '15px', 'backgroundColor': '#f0f0f0', 'borderRadius': '8px'}),
+        
         # Options de visualisation
         html.Div([
             html.Label("Colonne pour la visualisation:", 

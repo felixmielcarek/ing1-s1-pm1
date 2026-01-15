@@ -136,12 +136,17 @@ def display_map_page(tab):
 
 @callback(
     Output('map-color-column', 'options'),
+    Output('map-filter-carburant', 'options'),
+    Output('map-filter-critair', 'options'),
+    Output('map-filter-statut', 'options'),
+    Output('map-filter-groupe', 'options'),
+    Output('map-filter-categorie', 'options'),
     Input('choix_df', 'value'),
     prevent_initial_call=False
 )
 def update_map_columns(choix):
     """
-    Met à jour les colonnes disponibles pour la carte
+    Met à jour les colonnes disponibles pour la carte et les options de filtres
     """
     df = choix_df(
         choix,
@@ -164,9 +169,18 @@ def update_map_columns(choix):
     if df is not None:
         # Filtrer les colonnes numériques pour la visualisation
         numeric_cols = df.select_dtypes(include=['int64', 'float64']).columns.tolist()
-        return [{'label': col, 'value': col} for col in numeric_cols]
+        numeric_options = [{'label': col, 'value': col} for col in numeric_cols]
+        
+        # Options pour les filtres
+        carburant_options = [{'label': str(v), 'value': str(v)} for v in sorted(df['CARBURANT'].dropna().unique())] if 'CARBURANT' in df.columns else []
+        critair_options = [{'label': str(v), 'value': str(v)} for v in sorted(df['CRIT_AIR'].dropna().unique())] if 'CRIT_AIR' in df.columns else []
+        statut_options = [{'label': str(v), 'value': str(v)} for v in sorted(df['STATUT_UTILISATEUR'].dropna().unique())] if 'STATUT_UTILISATEUR' in df.columns else []
+        groupe_options = [{'label': str(v), 'value': str(v)} for v in sorted(df['GROUPE'].dropna().unique())] if 'GROUPE' in df.columns else []
+        categorie_options = [{'label': str(v), 'value': str(v)} for v in sorted(df['CATEGORIE'].dropna().unique())] if 'CATEGORIE' in df.columns else []
+        
+        return numeric_options, carburant_options, critair_options, statut_options, groupe_options, categorie_options
     
-    return []
+    return [], [], [], [], [], []
 
 @callback(
     Output('choropleth-map', 'figure'),
@@ -174,12 +188,17 @@ def update_map_columns(choix):
     Input('choix_df', 'value'),
     Input('map-color-column', 'value'),
     Input('map-groupby-column', 'value'),
+    Input('map-filter-carburant', 'value'),
+    Input('map-filter-critair', 'value'),
+    Input('map-filter-statut', 'value'),
+    Input('map-filter-groupe', 'value'),
+    Input('map-filter-categorie', 'value'),
     Input('active-tab', 'data'),
     prevent_initial_call=False
 )
-def update_map(choix, color_column, groupby_func, tab):
+def update_map(choix, color_column, groupby_func, filter_carburant, filter_critair, filter_statut, filter_groupe, filter_categorie, tab):
     """
-    Met à jour la carte choroplèthe Plotly avec les données sélectionnées
+    Met à jour la carte choroplèthe Plotly avec les données sélectionnées et les filtres
     """
     if tab != 'maps':
         return dash.no_update, dash.no_update
@@ -207,13 +226,32 @@ def update_map(choix, color_column, groupby_func, tab):
         empty_fig.update_layout(title="Aucune donnée disponible", height=700)
         return empty_fig, "Aucune donnée à afficher"
     
-    # Créer la carte
-    fig = create_choropleth_map(df, color_column, groupby_func or 'sum')
+    # Appliquer les filtres
+    df_filtered = df.copy()
+    
+    if filter_carburant and len(filter_carburant) > 0 and 'CARBURANT' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['CARBURANT'].isin(filter_carburant)]
+    
+    if filter_critair and len(filter_critair) > 0 and 'CRIT_AIR' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['CRIT_AIR'].isin(filter_critair)]
+    
+    if filter_statut and len(filter_statut) > 0 and 'STATUT_UTILISATEUR' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['STATUT_UTILISATEUR'].isin(filter_statut)]
+    
+    if filter_groupe and len(filter_groupe) > 0 and 'GROUPE' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['GROUPE'].isin(filter_groupe)]
+    
+    if filter_categorie and len(filter_categorie) > 0 and 'CATEGORIE' in df_filtered.columns:
+        df_filtered = df_filtered[df_filtered['CATEGORIE'].isin(filter_categorie)]
+    
+    # Créer la carte avec les données filtrées
+    fig = create_choropleth_map(df_filtered, color_column, groupby_func or 'sum')
     
     # Créer le message d'information
     total_rows = len(df)
-    unique_communes = df['COMMUNE_CODE'].nunique() if 'COMMUNE_CODE' in df.columns else 0
+    filtered_rows = len(df_filtered)
+    unique_communes = df_filtered['COMMUNE_CODE'].nunique() if 'COMMUNE_CODE' in df_filtered.columns else 0
     
-    info_msg = f"Total de {total_rows} lignes | {unique_communes} communes uniques dans les données"
+    info_msg = f"Total: {total_rows} lignes | Filtrées: {filtered_rows} lignes | {unique_communes} communes uniques"
     
     return fig, info_msg
