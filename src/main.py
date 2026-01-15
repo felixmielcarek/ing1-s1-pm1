@@ -33,6 +33,7 @@ from components.sidebar import *
 from utils.Fonctions import *
 from pages.graphique import layout_graphique
 from pages.fonctions import layout_fonctions
+from pages.map import layout_map
 # Moved to end to avoid circular import: from pages.back_end_pages.back_end_graphique import *
 
 #endregion
@@ -127,6 +128,7 @@ app.layout = html.Div(style={
                         
                     layout_graphique,
                     layout_fonctions,
+                    layout_map,
 
                     
                 ])
@@ -144,6 +146,7 @@ app.layout = html.Div(style={
 # Import callbacks after app is fully configured to avoid circular imports
 from pages.back_end_pages.back_end_graphique import *
 from pages.back_end_pages.back_end_fonctions import *
+from pages.back_end_pages.back_end_map import *
 @callback(
     Output('page-content', 'children'),
     Output('active-tab', 'data'),
