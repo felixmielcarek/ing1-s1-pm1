@@ -192,7 +192,7 @@ layout_fonctions = html.Table(id='table-options',children=[ #Tableau visible dan
                         dcc.RadioItems(#Permet de choisir quel type de moyenne utilisé
                             id='type_mean',
                             options=[
-                                {'label': 'Moyenne cumulée', 'value': 'mean_cum'},{'label': 'Moyenne par critère', 'value': 'mean_critere'}
+                                {'label': 'Moyenne cumulée', 'value': 'mean_cum'}
                             ],
                             value='mean_cum',inline=True,
                             style={'display': 'none'}
