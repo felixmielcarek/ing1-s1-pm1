@@ -1,6 +1,3 @@
-<<<<<<< Updated upstream
-=======
 ```bash
 pip install dash dash-bootstrap-components pandas pathlib plotly requests
 ```
->>>>>>> Stashed changes

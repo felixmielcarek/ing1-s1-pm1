@@ -661,9 +661,9 @@ def reference(palette_defaut,clear,filtre,tab,choix,value,color,button):
                color_selec.append(color)
         
         if palette_defaut is not None:
-           if palette_defaut == 'temperature':
+           if palette_defaut == 'Carburant':
                 color_selec = [{'hex': '#3138e7', 'rgb': {'r': 49, 'g': 56, 'b': 231, 'a': 1}}, {'hex': '#e9280b', 'rgb': {'r': 233, 'g': 40, 'b': 11, 'a': 1}}]  # bleu, rouge
-           elif palette_defaut == 'temps':
+           elif palette_defaut == 'Crit_Air':
                 color_selec = [{'hex': '#0b0808', 'rgb': {'r': 11, 'g': 8, 'b': 8, 'a': 1}}, {'hex': '#3138e7', 'rgb': {'r': 49, 'g': 56, 'b': 231, 'a': 1}}, {'hex': '#fa8342', 'rgb': {'r': 250, 'g': 131, 'b': 66, 'a': 1}}, {'hex': '#e9280b', 'rgb': {'r': 233, 'g': 40, 'b': 11, 'a': 1}}, {'hex': '#0b0808', 'rgb': {'r': 11, 'g': 8, 'b': 8, 'a': 1}}]  # noir, bleu, orange, rouge, noir
            elif palette_defaut == 'autre':
                 color_selec = [{'hex': '#636261', 'rgb': {'r': 99, 'g': 98, 'b': 97, 'a': 1}}, {'hex': '#0b0808', 'rgb': {'r': 11, 'g': 8, 'b': 8, 'a': 1}}]  # gris, fnoir

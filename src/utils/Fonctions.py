@@ -431,10 +431,6 @@ def stokes_law(x, k0, a0, K1):
 def two_slit_interference(x, A, k1, k2, x0, C):
     return A * np.sinc(k1 * (x - x0) / np.pi)**2 * np.cos(k2 * (x - x0))**2 + C
 
-def smooth_y_values(df, x_column, y_column, window_size=9):
-    sorted_df = df.sort_values(by=x_column)
-    smoothed_y = sorted_df[y_column].rolling(window=window_size, center=True).mean()
-    return sorted_df[x_column], smoothed_y
 
 #Fonction permettant de sauvegarder les données  
 def save_data(data, filename):
@@ -497,7 +493,6 @@ fitting_functions = {
     'Quartic': Quartic,
     'Stokes Law': stokes_law,
     'Two Slit Interference': two_slit_interference,
-    'Courbe moyennée 24h': smooth_y_values,
 } 
 
 #Fonction permettant de recrée les données manquantes temporel
