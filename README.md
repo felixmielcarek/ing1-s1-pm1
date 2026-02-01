@@ -1,4 +1,4 @@
-﻿# Parc Automobile Français - Dashboard Interactif
+# Parc Automobile Français - Dashboard Interactif
 
 ## Vue d'ensemble
 
@@ -6,7 +6,7 @@ Ce projet est une application web interactive développée en Python permettant 
 
 **Technologie principale :** Dash (framework web Python pour la création de dashboards interactifs)
 
-**Auteur principal :** Félix MIELCAREK et Micael FEBRAS FRAGOSO CARMONA
+**Auteurs :** Félix MIELCAREK et Micael FEBRAS FRAGOSO CARMONA
 
 **Licence :** MIT
 
@@ -35,34 +35,34 @@ Ce projet est une application web interactive développée en Python permettant 
 
 #### Étape 1 : Cloner ou télécharger le projet
 
-\\\ash
+```bash
 # Avec Git
 git clone <url-du-repository>
 cd ing1-s1-pm1
 
 # Ou télécharger et extraire le fichier ZIP
-\\\
+```
 
 #### Étape 2 : Créer et activer un environnement virtuel
 
 **Sur Windows (PowerShell) :**
-\\\ash
+```bash
 python -m venv .venv
-.\\.venv\\Scripts\\Activate.ps1
-\\\
+.\.venv\Scripts\Activate.ps1
+```
 
 **Sur macOS/Linux :**
-\\\ash
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
-\\\
+```
 
 #### Étape 3 : Installer les dépendances
 
-\\\ash
+```bash
 pip install --upgrade pip
 pip install -r requirements.txt
-\\\
+```
 
 Dépendances principales :
 - dash >= 2.0
@@ -78,11 +78,11 @@ Dépendances principales :
 
 Depuis la racine du projet :
 
-\\\ash
+```bash
 python src/main.py
-\\\
+```
 
-L'application s'ouvrira automatiquement dans votre navigateur par défaut à l'adresse \http://127.0.0.1:8050/\
+L'application s'ouvrira automatiquement dans votre navigateur par défaut à l'adresse `http://127.0.0.1:8050/`
 
 ### Utilisation du Dashboard
 
@@ -149,7 +149,7 @@ Les données utilisées dans ce projet proviennent des sources officielles suiva
 
 #### 1. **Données du Parc Automobile Communal (2025)**
 
-**Fichier :** \data/Donnees-sur-le-parc-de-vehicules-au-niveau-communal.2025-09.csv\
+**Fichier :** `data/Donnees-sur-le-parc-de-vehicules-au-niveau-communal.2025-09.csv`
 
 **Source :** Ministère de la Transition Écologique et Cohésion des Territoires (MTECT)  
 Base de données : Statistiques sur le développement durable  
@@ -171,7 +171,7 @@ Dataset comprehensive sur le parc automobile français par commune, incluant :
 
 #### 2. **Données Géospatiales (GeoJSON)**
 
-**Fichier :** \data/raw/communes.json\
+**Fichier :** `data/raw/communes.json`
 
 **Format :** GeoJSON (RFC 7946)
 
@@ -179,7 +179,7 @@ Dataset comprehensive sur le parc automobile français par commune, incluant :
 Contient les géométries des communes françaises avec les codes INSEE pour l'appariement avec les données du parc automobile.
 
 **Structure :**
-\\\json
+```json
 {
   "type": "FeatureCollection",
   "features": [
@@ -196,32 +196,32 @@ Contient les géométries des communes françaises avec les codes INSEE pour l'a
     }
   ]
 }
-\\\
+```
 
 ### Dictionnaire des Colonnes Principales
 
 | Colonne | Type | Description |
 |---------|------|-------------|
-| \COMMUNE_CODE\ | String | Code INSEE de la commune (ex: "75056") |
-| \COMMUNE_NOM\ | String | Nom officiel de la commune |
-| \CARBURANT\ | String | Type de carburant (Essence, Diesel, Électrique, Hybride, etc.) |
-| \CRITAIR\ | String | Classe environnementale (0-5, non-défini) |
-| \STATUT\ | String | Circulant/Non-circulant |
-| \GROUPE\ | String | Groupe de véhicules (VP, VUL, etc.) |
-| \CATEGORIE\ | String | Catégorie détaillée |
-| \NOMBRE\ | Integer | Nombre de véhicules |
+| `COMMUNE_CODE` | String | Code INSEE de la commune (ex: "75056") |
+| `COMMUNE_NOM` | String | Nom officiel de la commune |
+| `CARBURANT` | String | Type de carburant (Essence, Diesel, Électrique, Hybride, etc.) |
+| `CRITAIR` | String | Classe environnementale (0-5, non-défini) |
+| `STATUT` | String | Circulant/Non-circulant |
+| `GROUPE` | String | Groupe de véhicules (VP, VUL, etc.) |
+| `CATEGORIE` | String | Catégorie détaillée |
+| `NOMBRE` | Integer | Nombre de véhicules |
 
 ### Stockage et Organisation
 
-\\\
+```
 data/
 ├── Donnees-sur-le-parc-de-vehicules-au-niveau-communal.2025-09.csv  (données brutes)
 └── raw/
     └── communes.json  (géométries des communes)
-\\\
+```
 
 **Bonnes pratiques :**
-- Les fichiers dans \data/raw/\ ne doivent **jamais** être modifiés directement
+- Les fichiers dans `data/raw/` ne doivent **jamais** être modifiés directement
 - Tous les fichiers transformés ou nettoyés doivent être créés en mémoire ou exportés de manière contrôlée
 - Utilisez les fonctions de traitement de données pour toute manipulation
 
@@ -240,7 +240,7 @@ data/
 
 Le projet suit une architecture **séparation des responsabilités** avec une structure client-serveur utilisant Dash/Flask :
 
-\\\
+```
 ing1-s1-pm1/
 ├── src/
 │   ├── main.py                          # Point d'entrée principal
@@ -272,7 +272,7 @@ ing1-s1-pm1/
 ├── requirements.txt                     # Dépendances Python
 ├── LICENSE                              # Licence MIT
 └── README.md                            # Ce fichier
-\\\
+```
 
 ### Stack Technologique
 
@@ -291,32 +291,32 @@ ing1-s1-pm1/
 
 #### 1. Initialisation (main.py)
 
-\\\
+```
 - Crée l'application Dash
 - Configure les meta-tags et thèmes
 - Définit les chemins de base
 - Initialise les stores (dcc.Store) pour la persistence des données
 - Charge les layouts des pages
 - Importe les callbacks back-end
-\\\
+```
 
 #### 2. État Global (data_traitment.py)
 
 Utilise des **variables globales** pour maintenir l'état du DataFrame :
 
-\\\
+```python
 global_df_brut              # DataFrame brut chargé
 global_df_mean              # DataFrame avec moyennes calculées
 global_df_fusionnées        # DataFrames fusionnés
 global_meandf_fusionnées    # Moyennes des fusionnés
 global_df_1 à global_df_5   # 5 DataFrames utilisateur chargés
 global_meandf_1 à global_meandf_5  # Leurs moyennes respectives
-\\\
+```
 
 #### 3. Callbacks Principaux
 
 **Structure d'un callback Dash :**
-\\\python
+```python
 @callback(
     Output('component_id', 'property'),  # Composant de sortie
     Input('trigger_id', 'property'),     # Déclencheur
@@ -326,13 +326,13 @@ global_meandf_1 à global_meandf_5  # Leurs moyennes respectives
 def ma_fonction(input_value, state_value):
     # Traitement
     return resultat
-\\\
+```
 
 ### Ajouter une Nouvelle Page
 
 #### 1. Créer le layout (pages/ma_page.py)
 
-\\\python
+```python
 from dash import html, dcc
 
 layout_ma_page = html.Div(
@@ -345,26 +345,26 @@ layout_ma_page = html.Div(
         # ... autres composants
     ]
 )
-\\\
+```
 
 #### 2. Importer dans main.py
 
-\\\python
+```python
 from pages.ma_page import layout_ma_page
 
 # Dans app.layout, ajouter:
 layout_ma_page,
-\\\
+```
 
 #### 3. Ajouter l'onglet à la barre latérale (components/sidebar.py)
 
-\\\python
+```python
 generate_sidebar_item('bi-icon-name', 'Ma Page', 'tab-ma-page'),
-\\\
+```
 
 #### 4. Créer les callbacks (pages/back_end_pages/back_end_ma_page.py)
 
-\\\python
+```python
 from dash import Input, Output, callback
 import dash
 
@@ -386,13 +386,13 @@ def afficher_page(tab):
 def update_mon_graphique(filtre_value):
     # Logique de mise à jour
     return figure
-\\\
+```
 
 #### 5. Importer dans main.py
 
-\\\python
+```python
 from pages.back_end_pages.back_end_ma_page import *
-\\\
+```
 
 ### Ajouter un Nouveau Graphique
 
@@ -409,10 +409,10 @@ if type_graph == 'mon-nouveau-type':
 
 #### Approche 2 : Créer une fonction réutilisable
 
-\\\python
+```python
 # Dans utils/Fonctions.py
 def creer_graphique_personnalise(df, x, y, **kwargs):
-    \"\"\"
+    """
     Crée un graphique personnalisé.
     
     Args:
@@ -423,7 +423,7 @@ def creer_graphique_personnalise(df, x, y, **kwargs):
     
     Returns:
         go.Figure: Graphique Plotly
-    \"\"\"
+    """
     fig = go.Figure()
     
     # Logique
@@ -432,36 +432,36 @@ def creer_graphique_personnalise(df, x, y, **kwargs):
 
 # Utiliser dans back_end_graphique.py
 fig = creer_graphique_personnalise(df, x, y)
-\\\
+```
 
 ### Fonctions de Traitement de Données
 
 #### Chargement de fichier
 
-\\\python
+```python
 # Dans utils/Fonctions.py
 def parse_contents(contents, filename):
-    \"\"\"Charge et traite un fichier CSV ou Excel.\"\"\"
+    """Charge et traite un fichier CSV ou Excel."""
     # Détecte le format, l'encodage, le délimiteur
     # Retourne un DataFrame
     return df
-\\\
+```
 
 #### Filtrage
 
-\\\python
+```python
 # Application de filtres avec conditions multiples
 df_filtered = df[
     (df['colonne1'] > seuil) & 
     (df['colonne2'].isin(valeurs))
 ]
-\\\
+```
 
 #### Calcul de moyenne
 
-\\\python
+```python
 df_mean = df.groupby('colonne_groupe')[['col1', 'col2']].mean()
-\\\
+```
 
 ---
 
@@ -520,18 +520,18 @@ Ce projet analyse le parc automobile français pour extraire des insights clés 
 
 ### Cycle de Vie d'une Donnée
 
-\\\
+```
 Chargement → Validation → Stockage Global → Affichage → Export
     ↓           ↓             ↓              ↓        
   Parse      Transform    Store Dash     Callback
   CSV/XLSX   Encoding      (Memory)      Plotly
-\\\
+```
 
 ### Gestion des DataFrames Multiples
 
 Le système supporte jusqu'à 5 DataFrames utilisateur simultanément :
 
-\\\
+```
 global_df_1/global_df_2/global_df_3/global_df_4/global_df_5  ← DataFrames bruts
          ↓
 global_meandf_1/.../_5                                        ← DataFrames moyennés
@@ -541,7 +541,7 @@ Fusion optionnelle (global_df_fusionnées / global_meandf_fusionnées)
 global_df_brut (DataFrame actif sélectionné)
          ↓
 Affichage et Traitement
-\\\
+```
 
 ---
 
@@ -554,51 +554,51 @@ Je/nous déclare(s) sur l'honneur que le code fourni a été produit par moi/nou
 ### Code Emprunté et Références
 
 #### 1. **Framework Dash et Callbacks**
-- **Lignes** : Structure générale des callbacks (\@callback\)
+- **Lignes** : Structure générale des callbacks (`@callback`)
 - **Source** : Dash by Plotly - Documentation officielle (https://dash.plotly.com/)
 - **Explication** : Syntaxe standard de Dash pour réactifs et callbacks
-- **Fichiers affectés** : \main.py\, tous les fichiers \ack_end_pages/*.py\
+- **Fichiers affectés** : `main.py`, tous les fichiers `back_end_pages/*.py`
 
 #### 2. **Génération de Composants Bootstrap**
-- **Lignes** : Utilisation de \dbc.themes.BOOTSTRAP\ et composants Bootstrap
+- **Lignes** : Utilisation de `dbc.themes.BOOTSTRAP` et composants Bootstrap
 - **Source** : Dash Bootstrap Components (https://dash-bootstrap-components.opensource.faculty.ai/)
 - **Explication** : Syntaxe standard pour thèmes et composants UI
-- **Fichiers affectés** : \main.py\, \components/sidebar.py\
+- **Fichiers affectés** : `main.py`, `components/sidebar.py`
 
 #### 3. **Visualisation Plotly**
-- **Lignes** : \go.Figure()\, \make_subplots()\, \px.choropleth_mapbox()\
+- **Lignes** : `go.Figure()`, `make_subplots()`, `px.choropleth_mapbox()`
 - **Source** : Plotly Python Library (https://plotly.com/python/)
 - **Explication** : API standard de Plotly pour création de graphiques
-- **Fichiers affectés** : \pages/back_end_pages/back_end_graphique.py\, \ack_end_map.py\
+- **Fichiers affectés** : `pages/back_end_pages/back_end_graphique.py`, `back_end_map.py`
 
 #### 4. **Optimisation Curve Fitting avec SciPy**
-- **Lignes** : \curve_fit()\ de \scipy.optimize\, modèles mathématiques standards
+- **Lignes** : `curve_fit()` de `scipy.optimize`, modèles mathématiques standards
 - **Source** : SciPy Documentation (https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html)
 - **Explication** : Utilisation de l'algorithme Levenberg-Marquardt standard
-- **Fichiers affectés** : \pages/back_end_pages/back_end_graphique.py\
+- **Fichiers affectés** : `pages/back_end_pages/back_end_graphique.py`
 
 #### 5. **Détection d'Encodage et Délimiteur**
-- **Lignes** : \chardet.detect()\ et \csv.Sniffer().sniff()\
-- **Source** : Bibliothèques Python standard (\csv\, \chardet\)
+- **Lignes** : `chardet.detect()` et `csv.Sniffer().sniff()`
+- **Source** : Bibliothèques Python standard (`csv`, `chardet`)
 - **Explication** : Fonctions standard pour détection d'encodage et délimiteur CSV
-- **Fichiers affectés** : \utils/Fonctions.py\
+- **Fichiers affectés** : `utils/Fonctions.py`
 
 #### 6. **Manipulation Base64 et Fichiers**
-- **Lignes** : \ase64.b64decode()\, utilisation de \io.StringIO()\ et \io.BytesIO()\
+- **Lignes** : `base64.b64decode()`, utilisation de `io.StringIO()` et `io.BytesIO()`
 - **Source** : Python Standard Library
 - **Explication** : Méthodes standard pour encodage/décodage et gestion d'entrées/sorties
-- **Fichiers affectés** : \utils/Fonctions.py\
+- **Fichiers affectés** : `utils/Fonctions.py`
 
 #### 7. **Icônes Bootstrap**
 - **Source** : Bootstrap Icons CDN (https://cdn.jsdelivr.net/npm/bootstrap-icons/)
 - **Utilisation** : Icônes pour la barre de navigation
-- **Fichiers affectés** : \main.py\ (meta-tags)
+- **Fichiers affectés** : `main.py` (meta-tags)
 
 #### 8. **GeoJSON pour Cartes**
 - **Lignes** : Chargement et parsing de GeoJSON
 - **Source** : RFC 7946 GeoJSON Standard (https://tools.ietf.org/html/rfc7946)
 - **Explication** : Format standard pour données géospatiales
-- **Fichiers affectés** : \pages/back_end_pages/back_end_map.py\
+- **Fichiers affectés** : `pages/back_end_pages/back_end_map.py`
 
 ### Code Original
 
@@ -613,7 +613,7 @@ Tout le code non déclaré ci-dessus est réputé être produit par l'auteur (ou
 - Système de persistence d'état via stores Dash
 - Intégration de 20+ modèles de curve fitting
 - Logique des cartes choroplèthes avec filtres multiples
-- Tous les fichiers dans \utils/\, \components/\, \pages/\ sauf déclarations ci-dessus
+- Tous les fichiers dans `utils/`, `components/`, `pages/` sauf déclarations ci-dessus
 
 ### Licence
 
@@ -640,7 +640,7 @@ Pour toute question sur l'originalité du code, les sources utilisées, ou l'arc
 
 ### Développement et Débogage
 
-\\\ash
+```bash
 # Lancer avec rechargement automatique
 python src/main.py --debug
 
@@ -652,17 +652,17 @@ pip freeze > requirements.txt
 
 # Nettoyer les fichiers cache
 rm -r src/__pycache__ src/*/__pycache__ src/*/*/__pycache__
-\\\
+```
 
 ### Tests
 
-\\\ash
+```bash
 # Tester le chargement de données
 python -c "import pandas as pd; df = pd.read_csv('data/Donnees-sur-le-parc-de-vehicules-au-niveau-communal.2025-09.csv', delimiter=';'); print(df.shape)"
 
 # Vérifier l'installation des dépendances
 pip list
-\\\
+```
 
 ---
 
