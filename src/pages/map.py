@@ -1,0 +1,118 @@
+from dash import html, dcc
+import dash_bootstrap_components as dbc
+
+# Layout pour la page carte
+layout_map = html.Div(id='table-map', style={'display': 'none'}, children=[
+    html.Div([
+        html.H2("Carte Choroplèthe des Communes", style={
+            'textAlign': 'center',
+            'color': '#333',
+            'marginBottom': '20px',
+            'marginTop': '20px'
+        }),
+        
+        # Filtres de critères
+        html.Div([
+            html.H4("Filtres", style={'textAlign': 'center', 'marginBottom': '15px'}),
+            html.Div([
+                html.Div([
+                    html.Label("Carburant:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-carburant',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Crit'Air:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-critair',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Statut:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-statut',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Groupe:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-groupe',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'marginRight': '15px', 'verticalAlign': 'top'}),
+                
+                html.Div([
+                    html.Label("Catégorie:", style={'fontWeight': 'bold', 'marginBottom': '5px', 'display': 'block'}),
+                    dcc.Dropdown(
+                        id='map-filter-categorie',
+                        multi=True,
+                        placeholder='Tous',
+                        style={'width': '200px'}
+                    ),
+                ], style={'display': 'inline-block', 'verticalAlign': 'top'}),
+            ], style={'textAlign': 'center', 'marginBottom': '20px'})
+        ], style={'marginBottom': '25px', 'padding': '15px', 'backgroundColor': '#f0f0f0', 'borderRadius': '8px'}),
+        
+        # Options de visualisation
+        html.Div([
+            html.Label("Colonne pour la visualisation:", 
+                      style={'fontWeight': 'bold', 'marginRight': '10px'}),
+            dcc.Dropdown(
+                id='map-color-column',
+                placeholder='Sélectionner une colonne numérique...',
+                style={'width': '300px', 'display': 'inline-block', 'marginRight': '20px'}
+            ),
+            html.Label("Groupement:", 
+                      style={'fontWeight': 'bold', 'marginRight': '10px'}),
+            dcc.Dropdown(
+                id='map-groupby-column',
+                options=[
+                    {'label': 'Somme', 'value': 'sum'},
+                    {'label': 'Moyenne', 'value': 'mean'},
+                    {'label': 'Compte', 'value': 'count'},
+                    {'label': 'Maximum', 'value': 'max'},
+                    {'label': 'Minimum', 'value': 'min'}
+                ],
+                value='sum',
+                style={'width': '150px', 'display': 'inline-block'}
+            ),
+        ], style={'marginBottom': '20px', 'textAlign': 'center'}),
+        
+        # Conteneur pour la carte Plotly
+        dcc.Graph(
+            id='choropleth-map',
+            style={
+                'height': '700px',
+            },
+            config={'displayModeBar': True, 'scrollZoom': True}
+        ),
+        
+        # Informations sur les données
+        html.Div(id='map-info', style={
+            'marginTop': '20px',
+            'padding': '15px',
+            'backgroundColor': '#f8f9fa',
+            'borderRadius': '5px',
+            'textAlign': 'center'
+        })
+    ], style={
+        'padding': '20px',
+        'backgroundColor': 'white',
+        'borderRadius': '10px',
+        'boxShadow': '0 2px 4px rgba(0,0,0,0.1)'
+    })
+])
